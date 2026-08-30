@@ -26,13 +26,55 @@ function parseCsv(text) {
   if (field.length || row.length) { row.push(field.replace(/\r$/, "")); rows.push(row); }
   const [header, ...body] = rows.filter((r) => r.some((v) => v !== ""));
   if (!header) throw new Error("truth.csv is empty");
-  return body.map((values, index) => Object.fromEntries(header.map((key, i) => [key, values[i] ?? ""]))).map((r, i) => ({ ...r, __line: i + 2 }));
+  return body
+    .map((values) => Object.fromEntries(header.map((key, i) => [key, values[i] ?? ""])))
+    .map((r, i) => ({ ...r, __line: i + 2 }));
 }
 
-const rows = parseCsv(await readText("truth.csv"));
+const allRows = parseCsv(await readText("truth.csv"));
+const rows = allRows.filter((r) => !r.record_type || r.record_type === "block");
+const fontRows = allRows.filter((r) => r.record_type === "font_rule");
 if (rows.length !== 10) throw new Error(`truth.csv must contain exactly 10 block rows; found ${rows.length}`);
+
 const ids = rows.map((r) => r.product_id);
 if (new Set(ids).size !== ids.length) throw new Error("truth.csv contains duplicate product_id values");
+const blockIds = new Set(ids);
+
+const allowedFontScopes = new Set([
+  "brand",
+  "nav",
+  "row_heading",
+  "row_subheader",
+  "card_title",
+  "card_price",
+  "project_kicker",
+  "project_title",
+  "project_meta",
+  "project_description",
+  "action",
+  "preview_header",
+  "preview_source",
+  "preview_note",
+  "footer",
+  "footer_social",
+  "section_title",
+]);
+
+const fontRules = fontRows
+  .filter((r) => r.google_font?.trim())
+  .map((r) => {
+    const scope = r.font_scope?.trim();
+    const productId = r.font_product_id?.trim() || "";
+    const family = r.google_font.trim();
+    const weight = r.font_weight?.trim() || "400";
+    const style = r.font_style?.trim().toLowerCase() || "normal";
+    const fallback = r.font_fallback?.trim() || "sans-serif";
+    if (!allowedFontScopes.has(scope)) throw new Error(`truth.csv line ${r.__line}: invalid font_scope ${scope}`);
+    if (productId && !blockIds.has(productId)) throw new Error(`truth.csv line ${r.__line}: unknown font_product_id ${productId}`);
+    if (!/^(?:[1-9]00)$/.test(weight)) throw new Error(`truth.csv line ${r.__line}: font_weight must be 100 through 900`);
+    if (!["normal", "italic"].includes(style)) throw new Error(`truth.csv line ${r.__line}: font_style must be normal or italic`);
+    return { scope, product_id: productId, family, weight, style, fallback };
+  });
 
 const first = rows[0];
 const site = {
@@ -53,6 +95,7 @@ const site = {
   preview_header: first.preview_header || "Project Preview",
   preview_source_prefix: first.preview_source_prefix || "Quandranea / PROJECT",
   preview_note: first.preview_note || "Portfolio project preview",
+  font_rules: fontRules,
 };
 
 const allowedAvailability = new Set(["available", "low_stock", "sold_out", "temporarily_unavailable", "discontinued", "preorder", "unknown", "mapping_error", "suspended"]);
@@ -78,7 +121,7 @@ const blocks = rows.sort((a, b) => Number(a.order) - Number(b.order)).map((r) =>
   };
 });
 
-const truth = { schema_version: "1.0.0", generated_from: "truth.csv", site, blocks };
+const truth = { schema_version: "1.1.0", generated_from: "truth.csv", site, blocks };
 await writeJson("data/truth.generated.json", truth);
 
 const catalogPaths = ["data/catalogs/nume-marketplace.v1.json", "data/catalog-sync/published-marketplace.v1.json"];
@@ -120,4 +163,4 @@ for (const layoutPath of layoutPaths) {
   await writeJson(layoutPath, layout);
 }
 
-console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${site.header_nav.length} nav links.`);
+console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${site.header_nav.length} nav links, ${fontRules.length} active font rules.`);
