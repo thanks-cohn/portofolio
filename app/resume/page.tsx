@@ -1,5 +1,5 @@
-import { PortfolioSection } from "../portfolio-section";
+import { ResumeExperience } from "./resume-experience";
 
 export default function ResumePage() {
-  return <PortfolioSection section="RESUME" />;
+  return <ResumeExperience />;
 }
