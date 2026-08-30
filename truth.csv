@@ -3,7 +3,7 @@ block,product_nume_objects_01,1,Quandranea,Scene Designer,Q,M,HOME,/,ACTING,/act
 block,product_nume_objects_02,2,,,,,,,,,,,,,,,,,,,,,Arc Bookend Pair,Arc Bookend Pair is weighty geometric bookends designed to organize a shelf with sculptural clarity.,7600,usd,available,https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Arc Bookend Pair,Visit project,,,,,,,,,,,,,
 block,product_nume_objects_03,3,,,,,,,,,,,,,,,,,,,,,Grid Catchall Tray,Grid Catchall Tray is low-profile catchall tray for keys and desk tools finished in a calm stone tone.,8800,usd,low_stock,https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Grid Catchall Tray,Visit project,,,,,,,,,,,,,
 block,product_nume_objects_04,4,,,,,,,,,,,,,,,,,,,,,Volume Ceramic Cup,Volume Ceramic Cup is glazed ceramic mug with a comfortable handle and a playful high-contrast finish.,4200,usd,available,https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Volume Ceramic Cup,Visit project,,,,,,,,,,,,,
-block,product_nume_objects_05,5,,,,,,,,,,,,,,,,,,,,,Plane Desk Mat,Plane Desk Mat is generous desk mat with a smooth work surface and precisely finished edges.,5800,usd,sold_out,https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Plane Desk Mat,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_05,5,,,,,,,,,,,,,,,,,,,,,Plane Desk Mat,THIS IS A TEXT EDIT.,5800,usd,sold_out,https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Plane Desk Mat,Visit project,,,,,,,,,,,,,
 block,product_nume_objects_06,6,,,,,,,,,,,,,,,,,,,,,Index Steel Bottle,Index Steel Bottle is reusable steel bottle with a leak-resistant cap and a brushed metallic body.,9600,usd,available,https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Index Steel Bottle,Visit project,,,,,,,,,,,,,
 block,product_nume_objects_07,7,,,,,,,,,,,,,,,,,,,,,Halo Incense Stand,Halo Incense Stand is minimal incense holder designed to catch ash in a compact sculptural dish.,3400,usd,temporarily_unavailable,https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Halo Incense Stand,Visit project,,,,,,,,,,,,,
 block,product_nume_objects_08,8,,,,,,,,,,,,,,,,,,,,,Fold Canvas Basket,Fold Canvas Basket is foldable canvas basket with reinforced seams for calm flexible home storage.,4800,usd,available,https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Fold Canvas Basket,Visit project,,,,,,,,,,,,,
@@ -33,3 +33,48 @@ color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,row_subheader,,#ff2bd6
 color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_title,,#ff2bd6
 color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_price,,#ff2bd6
 color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,footer,,#ff2bd6
+page_text,acting,,,,,,,,,,,,,,,,,,,,,,title,ACTING,,,,,,,,,,,,,,,,,,,
+page_text,acting,,,,,,,,,,,,,,,,,,,,,,kicker,Performance,,,,,,,,,,,,,,,,,,,
+page_text,acting,,,,,,,,,,,,,,,,,,,,,,body,"Selected acting work, performance credits, and material can live here. Replace this text with the work you want visitors to see.",,,,,,,,,,,,,,,,,,,
+page_text,design,,,,,,,,,,,,,,,,,,,,,,title,DESIGN,,,,,,,,,,,,,,,,,,,
+page_text,design,,,,,,,,,,,,,,,,,,,,,,kicker,Scenic & Visual Work,,,,,,,,,,,,,,,,,,,
+page_text,design,,,,,,,,,,,,,,,,,,,,,,body,"A space for design practice, selected productions, visual research, process notes, and the work behind the finished scene.",,,,,,,,,,,,,,,,,,,
+page_text,contact,,,,,,,,,,,,,,,,,,,,,,title,CONTACT,,,,,,,,,,,,,,,,,,,
+page_text,contact,,,,,,,,,,,,,,,,,,,,,,kicker,Get in touch,,,,,,,,,,,,,,,,,,,
+page_text,contact,,,,,,,,,,,,,,,,,,,,,,body,"For collaborations, production inquiries, and creative work, send a message.",,,,,,,,,,,,,,,,,,,
+page_text,contact,,,,,,,,,,,,,,,,,,,,,,email,hello@example.com,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,intro_title,RESUME,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,intro_hint,Scroll back up anytime,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,name,QUANDRANEA M. MAYBE,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,headline,Scene Designer & Keeper of Improbable Rooms,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,location,Somewhere just offstage,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,email,hello@example.com,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,availability,Available after intermission,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,profile_heading,Profile,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,profile,"Scene designer with a fondness for theatrical architecture, impossible entrances, practical illusions, and making a perfectly normal chair feel suspicious.",,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_heading,Experience,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_1_role,Lead Scene Designer,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_1_dates,2024–Present,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_1_place,The Department of Dramatic Entrances,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_1_bullets,"Designed rooms that looked expensive while remaining legally just plywood.
+Coordinated scenic builds, paint treatments, prop logic, and audience sightlines.
+Reduced emergency fog-machine diplomacy by a statistically meaningful amount.",,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_2_role,Assistant Scenic Designer,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_2_dates,2022–2024,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_2_place,The Very Serious Players,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,experience_2_bullets,"Prepared drafting packages, research boards, models, and production notes.
+Tracked scenic changes through rehearsals without losing the one important stool.
+Maintained calm when someone said “what if the wall simply flew away?”",,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,credits_heading,Selected Credits,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,credits,"The Chair That Knew Too Much — Scenic Design
+Three Doors, No Exit, One Snack Table — Scenic Design
+A Respectable Amount of Fog — Associate Designer
+Hamlet, But the Couch Is Important — Assistant Designer",,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,education_heading,Education,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,education_degree,"B.F.A., Theatre Design",,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,education_year,2022,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,education_school,University of Extremely Specific Curtains,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,skills_heading,Skills,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,skills,Scenic design · drafting · model making · visual research · paint elevations · production collaboration · Vectorworks-adjacent confidence · emergency glitter containment,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,references_heading,References,,,,,,,,,,,,,,,,,,,
+page_text,resume,,,,,,,,,,,,,,,,,,,,,,references,"Available upon request, assuming the stage manager has forgiven me.",,,,,,,,,,,,,,,,,,,
