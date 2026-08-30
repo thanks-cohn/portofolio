@@ -85,30 +85,18 @@ const rows = allRows.filter((r) => !r.record_type || r.record_type === "block");
 const fontRows = allRows.filter((r) => r.record_type === "font_rule");
 const colorRows = allRows.filter((r) => r.record_type === "color_rule");
 const pageRows = allRows.filter((r) => r.record_type === "page_text");
-if (rows.length !== 10) throw new Error(`truth.csv must contain exactly 10 block rows; found ${rows.length}`);
+const sectionRows = allRows.filter((r) => r.record_type === "page_section");
+if (!rows.length) throw new Error("truth.csv must contain at least one block row");
 
 const ids = rows.map((r) => r.product_id);
+if (ids.some((id) => !id?.trim())) throw new Error("truth.csv block rows require product_id");
 if (new Set(ids).size !== ids.length) throw new Error("truth.csv contains duplicate product_id values");
 const blockIds = new Set(ids);
 
 const allowedTextScopes = new Set([
-  "brand",
-  "nav",
-  "row_heading",
-  "row_subheader",
-  "card_title",
-  "card_price",
-  "project_kicker",
-  "project_title",
-  "project_meta",
-  "project_description",
-  "action",
-  "preview_header",
-  "preview_source",
-  "preview_note",
-  "footer",
-  "footer_social",
-  "section_title",
+  "brand", "nav", "row_heading", "row_subheader", "card_title", "card_price",
+  "project_kicker", "project_title", "project_meta", "project_description", "action",
+  "preview_header", "preview_source", "preview_note", "footer", "footer_social", "section_title",
 ]);
 
 const fontRules = fontRows
@@ -140,14 +128,55 @@ const colorRules = colorRows
   });
 
 const pages = structuredClone(PAGE_DEFAULTS);
+for (const page of Object.values(pages)) page.sections = [];
 for (const row of pageRows) {
   const pageKey = row.product_id?.trim().toLowerCase();
   const fieldKey = row.title?.trim();
   if (!pageKey || !fieldKey) throw new Error(`truth.csv line ${row.__line}: page_text rows require product_id=page key and title=field key`);
   if (!(pageKey in pages)) throw new Error(`truth.csv line ${row.__line}: unknown page ${pageKey}`);
-  if (!(fieldKey in pages[pageKey])) throw new Error(`truth.csv line ${row.__line}: unknown ${pageKey} page field ${fieldKey}`);
+  if (!(fieldKey in pages[pageKey]) || fieldKey === "sections") throw new Error(`truth.csv line ${row.__line}: unknown ${pageKey} page field ${fieldKey}`);
   pages[pageKey][fieldKey] = row.description ?? "";
 }
+
+const tags = new Set(["p", "h1", "h2", "h3", "h4", "h5", "h6"]);
+const tag = (value, fallback) => tags.has((value || "").trim().toLowerCase()) ? value.trim().toLowerCase() : fallback;
+const color = (value, fallback = "") => /^#[0-9a-fA-F]{3,8}$/.test((value || "").trim()) ? value.trim() : fallback;
+const fontUrl = (value) => {
+  const v = (value || "").trim();
+  if (!v) return "";
+  try {
+    const u = new URL(v);
+    return u.protocol === "https:" && u.hostname === "fonts.googleapis.com" ? v : "";
+  } catch { return ""; }
+};
+
+for (const row of sectionRows) {
+  const pageKey = row.product_id?.trim().toLowerCase();
+  if (!pageKey || !["acting", "design", "contact"].includes(pageKey)) {
+    throw new Error(`truth.csv line ${row.__line}: page_section product_id must be acting, design, or contact`);
+  }
+  const order = Number(row.order);
+  if (!Number.isInteger(order) || order < 1) throw new Error(`truth.csv line ${row.__line}: page_section order must be a positive integer`);
+  pages[pageKey].sections.push({
+    order,
+    image_side: ["left", "right"].includes((row.availability || "").toLowerCase()) ? row.availability.toLowerCase() : (order % 2 ? "left" : "right"),
+    image_url: row.image_url || "",
+    image_alt: row.image_alt || "",
+    header: row.title || "",
+    subheader: row.destination_label || "",
+    body: row.description || "",
+    header_tag: tag(row.font_scope, "h2"),
+    subheader_tag: tag(row.font_product_id, "h3"),
+    body_tag: tag(row.color_scope, "p"),
+    header_color: color(row.text_color),
+    subheader_color: color(row.color_product_id),
+    body_color: color(row.footer_icon_ref),
+    header_font_url: fontUrl(row.destination_url),
+    subheader_font_url: fontUrl(row.footer_icon_label),
+    body_font_url: fontUrl(row.footer_icon_url),
+  });
+}
+for (const page of Object.values(pages)) page.sections.sort((a, b) => a.order - b.order);
 
 const first = rows[0];
 const site = {
@@ -156,10 +185,8 @@ const site = {
   brand_top: first.brand_top || "Q",
   brand_bottom: first.brand_bottom || "M",
   header_nav: [
-    [first.nav_home_label, first.nav_home_url],
-    [first.nav_acting_label, first.nav_acting_url],
-    [first.nav_design_label, first.nav_design_url],
-    [first.nav_resume_label, first.nav_resume_url],
+    [first.nav_home_label, first.nav_home_url], [first.nav_acting_label, first.nav_acting_url],
+    [first.nav_design_label, first.nav_design_url], [first.nav_resume_label, first.nav_resume_url],
     [first.nav_contact_label, first.nav_contact_url],
   ].filter(([label, url]) => label && url).map(([label, url]) => ({ label, url })),
   footer_left: first.footer_left || "Quandrnea - 2026",
@@ -174,14 +201,18 @@ const site = {
 
 const allowedAvailability = new Set(["available", "low_stock", "sold_out", "temporarily_unavailable", "discontinued", "preorder", "unknown", "mapping_error", "suspended"]);
 const blocks = rows.sort((a, b) => Number(a.order) - Number(b.order)).map((r) => {
+  const order = Number(r.order);
   const price = Number(r.price_minor);
+  if (!Number.isInteger(order) || order < 1) throw new Error(`truth.csv line ${r.__line}: order must be a positive integer`);
   if (!Number.isInteger(price) || price < 0) throw new Error(`truth.csv line ${r.__line}: price_minor must be a non-negative integer`);
   if (!allowedAvailability.has(r.availability)) throw new Error(`truth.csv line ${r.__line}: invalid availability ${r.availability}`);
+  if (!r.image_url?.trim()) throw new Error(`truth.csv line ${r.__line}: image_url is required`);
+  if (!r.image_alt?.trim()) throw new Error(`truth.csv line ${r.__line}: image_alt is required`);
   return {
     product_id: r.product_id,
-    order: Number(r.order),
-    title: r.title,
-    description: r.description,
+    order,
+    title: r.title || "Untitled Project",
+    description: r.description || "",
     price_minor: price,
     currency: (r.currency || "usd").toLowerCase(),
     availability: r.availability,
@@ -195,32 +226,70 @@ const blocks = rows.sort((a, b) => Number(a.order) - Number(b.order)).map((r) =>
   };
 });
 
-const truth = { schema_version: "1.3.0", generated_from: "truth.csv", site, blocks, pages };
+const truth = { schema_version: "1.4.0", generated_from: "truth.csv", site, blocks, pages };
 await writeJson("data/truth.generated.json", truth);
+
+function generatedProduct(template, block) {
+  const token = block.product_id.replace(/^product_/, "").replace(/[^a-zA-Z0-9_-]+/g, "_");
+  const product = structuredClone(template);
+  product.product_id = block.product_id;
+  product.storefront_id = "storefront_numenume";
+  product.title = block.title;
+  product.description = block.description;
+  product.active = true;
+  product.status = "active";
+  product.tags = ["quandranea", "portfolio", "generated"];
+  const media = structuredClone(template.media?.[0] || {});
+  media.media_id = `media_${token}`;
+  media.role = "hero";
+  media.source = "manual";
+  media.url = block.image_url;
+  media.object_key = `portfolio/${token}`;
+  media.alt = block.image_alt;
+  media.sort_order = 0;
+  product.media = [media];
+  const variant = structuredClone(template.variants?.[0] || {});
+  variant.variant_id = `variant_${token}_standard`;
+  variant.sku = `PORTFOLIO-${String(block.order).padStart(3, "0")}`;
+  variant.title = "Standard";
+  variant.active = !["sold_out", "temporarily_unavailable", "discontinued", "mapping_error", "suspended", "unknown"].includes(block.availability);
+  variant.options = [{ name: "edition", value: "Standard" }];
+  variant.retail_price = { amount_minor: block.price_minor, currency: block.currency };
+  variant.compare_at_price = null;
+  variant.availability = {
+    status: block.availability,
+    source: "manual",
+    quantity: null,
+    checked_at: null,
+    reason: null,
+    allow_backorder: false,
+  };
+  variant.fulfillment = {
+    provider_id: "provider_manual",
+    provider_product_id: `portfolio_${token}`,
+    provider_variant_id: `portfolio_${token}_standard`,
+    provider_sku: `PORTFOLIO-${String(block.order).padStart(3, "0")}`,
+    requires_shipping: false,
+    production_cost: { amount_minor: 0, currency: block.currency },
+    extensions: { "manual.portfolio_mapping": true },
+  };
+  variant.external_references = [{ system: "other", id: `portfolio_variant_${token}`, account_id: null, provider_id: "provider_manual", url: null }];
+  variant.extensions = { ...(variant.extensions || {}), "nume.checkout_state": "demo_only" };
+  product.variants = [variant];
+  product.external_references = [{ system: "other", id: `portfolio_product_${token}`, account_id: null, provider_id: "provider_manual", url: null }];
+  product.extensions = { ...(product.extensions || {}), "nume.collection": "Quandranea Portfolio" };
+  return product;
+}
 
 const catalogPaths = ["data/catalogs/nume-marketplace.v1.json", "data/catalog-sync/published-marketplace.v1.json"];
 for (const catalogPath of catalogPaths) {
   const catalog = await readJson(catalogPath);
-  const byId = new Map(catalog.products.map((p) => [p.product_id, p]));
-  for (const block of blocks) {
-    const product = byId.get(block.product_id);
-    if (!product) throw new Error(`${catalogPath}: missing ${block.product_id}`);
-    product.title = block.title;
-    product.description = block.description;
-    product.active = true;
-    product.status = "active";
-    if (product.media?.[0]) {
-      product.media[0].url = block.image_url;
-      product.media[0].alt = block.image_alt;
-    }
-    const variant = product.variants?.[0];
-    if (variant) {
-      variant.retail_price.amount_minor = block.price_minor;
-      variant.retail_price.currency = block.currency;
-      variant.availability.status = block.availability;
-      variant.active = !["sold_out", "temporarily_unavailable", "discontinued", "mapping_error", "suspended", "unknown"].includes(block.availability);
-    }
-  }
+  const targetProducts = catalog.products.filter((p) => p.storefront_id === "storefront_numenume");
+  const template = targetProducts[0] || catalog.products[0];
+  if (!template) throw new Error(`${catalogPath}: no product template available`);
+  const existing = new Map(targetProducts.map((p) => [p.product_id, p]));
+  const rebuilt = blocks.map((block) => generatedProduct(existing.get(block.product_id) || template, block));
+  catalog.products = catalog.products.filter((p) => p.storefront_id !== "storefront_numenume").concat(rebuilt);
   await writeJson(catalogPath, catalog);
 }
 
@@ -237,4 +306,4 @@ for (const layoutPath of layoutPaths) {
   await writeJson(layoutPath, layout);
 }
 
-console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${site.header_nav.length} nav links, ${fontRules.length} active font rules, ${colorRules.length} active color rules, ${pageRows.length} page text overrides.`);
+console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${sectionRows.length} page sections, ${site.header_nav.length} nav links, ${fontRules.length} active font rules, ${colorRules.length} active color rules.`);
