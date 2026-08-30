@@ -35,7 +35,8 @@ function googleFamily(url: string) {
 }
 
 function TextElement({ tag, text, color, fontUrl, className }: { tag: TextTag; text: string; color?: string; fontUrl?: string; className: string }) {
-  const style = { color: color || undefined, fontFamily: googleFamily(fontUrl || "") ? `'${googleFamily(fontUrl || "")}', sans-serif` : undefined };
+  const family = googleFamily(fontUrl || "");
+  const style = { color: color || undefined, fontFamily: family ? `'${family}', sans-serif` : undefined };
   switch (tag) {
     case "h1": return <h1 className={className} style={style}>{text}</h1>;
     case "h2": return <h2 className={className} style={style}>{text}</h2>;
@@ -49,9 +50,13 @@ function TextElement({ tag, text, color, fontUrl, className }: { tag: TextTag; t
 
 export function PortfolioSection({ section }: { section: SectionKey }) {
   const key = section.toLowerCase() as "acting" | "design" | "contact";
-  const page = truthData.pages[key] as typeof truthData.pages[typeof key] & { sections?: PageSection[] };
-  const sections = page.sections ?? [];
-  const fontUrls = [...new Set(sections.flatMap((item) => [item.header_font_url, item.subheader_font_url, item.body_font_url]).filter(Boolean))];
+  const page = truthData.pages[key];
+  const sections = ((page as unknown as { sections?: PageSection[] }).sections ?? []) as PageSection[];
+  const fontUrls = [...new Set(
+    sections
+      .flatMap((item) => [item.header_font_url, item.subheader_font_url, item.body_font_url])
+      .filter((href): href is string => Boolean(href)),
+  )];
 
   return (
     <main className={`portfolio-section portfolio-section-${key}`}>
