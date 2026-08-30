@@ -1,4 +1,33 @@
-/* Preserve the original NUmE-platform presentation exactly; only show the Venasi / VENASI objects row. */
+/* Preserve the original NUmE-platform presentation; only show the Quandranea row. */
 .gallery-row:not([data-nume-row="row_nume_objects"]) {
   display: none !important;
+}
+
+/* Give the single strip deliberate breathing room without changing the row itself. */
+.gallery {
+  padding-top: clamp(190px, 24vh, 270px) !important;
+  padding-bottom: clamp(190px, 24vh, 270px) !important;
+}
+
+/* Portfolio masthead copy. */
+.header-note {
+  font-size: 0 !important;
+  text-transform: none !important;
+}
+
+.header-note i {
+  display: none !important;
+}
+
+.header-note::before {
+  content: "Passion - 2026";
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+
+@media (max-width: 900px) {
+  .gallery {
+    padding-top: clamp(150px, 20vh, 210px) !important;
+    padding-bottom: clamp(150px, 20vh, 210px) !important;
+  }
 }
