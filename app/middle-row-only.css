@@ -1,4 +1,4 @@
-/* Preserve the original NUmE-platform presentation exactly; only hide non-center rows. */
-.gallery-row:not(.row-3) {
+/* Preserve the original NUmE-platform presentation exactly; only show the Venasi / VENASI objects row. */
+.gallery-row:not([data-nume-row="row_nume_objects"]) {
   display: none !important;
 }
