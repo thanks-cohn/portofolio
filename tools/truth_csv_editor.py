@@ -11,6 +11,10 @@ only, with Contents: Read and write.
 Normal edits modify local truth.csv. "Publish to GitHub" replaces the repo's
 truth.csv on main, which triggers the existing GitHub Pages workflow.
 standard.csv is the factory/default snapshot and is never edited by this tool.
+
+Page copy (ACTING, DESIGN, CONTACT, and the full RESUME) is represented as
+record_type=page_text rows. Older truth.csv/standard.csv files that do not yet
+contain those rows are upgraded in memory with the current baseline copy.
 """
 
 from __future__ import annotations
@@ -24,6 +28,7 @@ import tkinter as tk
 import urllib.error
 import urllib.parse
 import urllib.request
+from io import StringIO
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
@@ -67,6 +72,111 @@ BLOCK_FIELDS = [
     ("footer_icon_url", "Footer icon URL", False),
 ]
 
+PAGE_FIELDS: dict[str, list[tuple[str, str, bool, str]]] = {
+    "acting": [
+        ("title", "Page title", False, "ACTING"),
+        ("kicker", "Small heading", False, "Performance"),
+        (
+            "body",
+            "Page text",
+            True,
+            "Selected acting work, performance credits, and material can live here. "
+            "Replace this text with the work you want visitors to see.",
+        ),
+    ],
+    "design": [
+        ("title", "Page title", False, "DESIGN"),
+        ("kicker", "Small heading", False, "Scenic & Visual Work"),
+        (
+            "body",
+            "Page text",
+            True,
+            "A space for design practice, selected productions, visual research, process notes, "
+            "and the work behind the finished scene.",
+        ),
+    ],
+    "contact": [
+        ("title", "Page title", False, "CONTACT"),
+        ("kicker", "Small heading", False, "Get in touch"),
+        (
+            "body",
+            "Page text",
+            True,
+            "For collaborations, production inquiries, and creative work, send a message.",
+        ),
+        ("email", "Email address", False, "hello@example.com"),
+    ],
+    "resume": [
+        ("intro_title", "Opening title", False, "RESUME"),
+        ("intro_hint", "Opening hint", False, "Scroll back up anytime"),
+        ("name", "Name", False, "QUANDRANEA M. MAYBE"),
+        ("headline", "Professional headline", False, "Scene Designer & Keeper of Improbable Rooms"),
+        ("location", "Location", False, "Somewhere just offstage"),
+        ("email", "Email", False, "hello@example.com"),
+        ("availability", "Availability / contact note", False, "Available after intermission"),
+        ("profile_heading", "Profile section heading", False, "Profile"),
+        (
+            "profile",
+            "Profile",
+            True,
+            "Scene designer with a fondness for theatrical architecture, impossible entrances, "
+            "practical illusions, and making a perfectly normal chair feel suspicious.",
+        ),
+        ("experience_heading", "Experience section heading", False, "Experience"),
+        ("experience_1_role", "Job 1 — role", False, "Lead Scene Designer"),
+        ("experience_1_dates", "Job 1 — dates", False, "2024–Present"),
+        ("experience_1_place", "Job 1 — company / production", False, "The Department of Dramatic Entrances"),
+        (
+            "experience_1_bullets",
+            "Job 1 — bullet points (one per line)",
+            True,
+            "Designed rooms that looked expensive while remaining legally just plywood.\n"
+            "Coordinated scenic builds, paint treatments, prop logic, and audience sightlines.\n"
+            "Reduced emergency fog-machine diplomacy by a statistically meaningful amount.",
+        ),
+        ("experience_2_role", "Job 2 — role", False, "Assistant Scenic Designer"),
+        ("experience_2_dates", "Job 2 — dates", False, "2022–2024"),
+        ("experience_2_place", "Job 2 — company / production", False, "The Very Serious Players"),
+        (
+            "experience_2_bullets",
+            "Job 2 — bullet points (one per line)",
+            True,
+            "Prepared drafting packages, research boards, models, and production notes.\n"
+            "Tracked scenic changes through rehearsals without losing the one important stool.\n"
+            "Maintained calm when someone said “what if the wall simply flew away?”",
+        ),
+        ("credits_heading", "Credits section heading", False, "Selected Credits"),
+        (
+            "credits",
+            "Selected credits (one per line)",
+            True,
+            "The Chair That Knew Too Much — Scenic Design\n"
+            "Three Doors, No Exit, One Snack Table — Scenic Design\n"
+            "A Respectable Amount of Fog — Associate Designer\n"
+            "Hamlet, But the Couch Is Important — Assistant Designer",
+        ),
+        ("education_heading", "Education section heading", False, "Education"),
+        ("education_degree", "Degree / training", False, "B.F.A., Theatre Design"),
+        ("education_year", "Education year", False, "2022"),
+        ("education_school", "School", False, "University of Extremely Specific Curtains"),
+        ("skills_heading", "Skills section heading", False, "Skills"),
+        (
+            "skills",
+            "Skills",
+            True,
+            "Scenic design · drafting · model making · visual research · paint elevations · "
+            "production collaboration · Vectorworks-adjacent confidence · emergency glitter containment",
+        ),
+        ("references_heading", "References section heading", False, "References"),
+        (
+            "references",
+            "References text",
+            True,
+            "Available upon request, assuming the stage manager has forgiven me.",
+        ),
+    ],
+}
+
 
 class GithubFailure(RuntimeError):
     pass
@@ -76,8 +186,8 @@ class TruthEditor(tk.Tk):
     def __init__(self, initial_path: Path | None = None) -> None:
         super().__init__()
         self.title("Quandranea portfolio editor")
-        self.geometry("1180x830")
-        self.minsize(940, 680)
+        self.geometry("1210x850")
+        self.minsize(960, 700)
 
         self.path: Path | None = None
         self.fieldnames: list[str] = []
@@ -86,6 +196,8 @@ class TruthEditor(tk.Tk):
         self.current_block_position: int | None = None
         self.entries: dict[str, tk.Text | ttk.Entry] = {}
         self.global_entries: dict[str, ttk.Entry] = {}
+        self.page_entries: dict[tuple[str, str], tk.Text | ttk.Entry] = {}
+        self.page_row_indices: dict[tuple[str, str], int] = {}
 
         config = self._load_config()
         self.token_location = tk.StringVar(value=config.get("token_location", "NULL"))
@@ -166,15 +278,18 @@ class TruthEditor(tk.Tk):
 
         block_tab = ttk.Frame(notebook, padding=12)
         global_tab = ttk.Frame(notebook, padding=12)
+        pages_tab = ttk.Frame(notebook, padding=12)
         notebook.add(block_tab, text="Selected block")
         notebook.add(global_tab, text="Global text & links")
+        notebook.add(pages_tab, text="Pages")
 
         block_canvas, block_inner = self._scrolling_frame(block_tab)
         block_canvas.pack(fill="both", expand=True)
         for field, label, multiline in BLOCK_FIELDS:
             ttk.Label(block_inner, text=label).pack(anchor="w", pady=(10, 4))
+            widget: tk.Text | ttk.Entry
             if multiline:
-                widget: tk.Text | ttk.Entry = tk.Text(block_inner, height=5, wrap="word", undo=True)
+                widget = tk.Text(block_inner, height=5, wrap="word", undo=True)
             else:
                 widget = ttk.Entry(block_inner)
             widget.pack(fill="x")
@@ -197,6 +312,38 @@ class TruthEditor(tk.Tk):
             entry = ttk.Entry(global_inner)
             entry.pack(fill="x")
             self.global_entries[field] = entry
+
+        page_notebook = ttk.Notebook(pages_tab)
+        page_notebook.pack(fill="both", expand=True)
+        for page_key, page_label in (
+            ("acting", "ACTING"),
+            ("design", "DESIGN"),
+            ("resume", "RESUME"),
+            ("contact", "CONTACT"),
+        ):
+            tab = ttk.Frame(page_notebook, padding=8)
+            page_notebook.add(tab, text=page_label)
+            canvas, inner = self._scrolling_frame(tab)
+            canvas.pack(fill="both", expand=True)
+            ttk.Label(
+                inner,
+                text=f"{page_label} page text",
+                font=("TkDefaultFont", 11, "bold"),
+            ).pack(anchor="w", pady=(2, 8))
+            for field_key, label, multiline, _default in PAGE_FIELDS[page_key]:
+                ttk.Label(inner, text=label).pack(anchor="w", pady=(10, 4))
+                if multiline:
+                    widget = tk.Text(inner, height=5, wrap="word", undo=True)
+                else:
+                    widget = ttk.Entry(inner)
+                widget.pack(fill="x")
+                self.page_entries[(page_key, field_key)] = widget
+            ttk.Label(
+                inner,
+                text="These fields are stored inside truth.csv and deploy with the rest of the portfolio.",
+                foreground="#666",
+                wraplength=720,
+            ).pack(anchor="w", pady=(18, 8))
 
     def _scrolling_frame(self, parent: ttk.Frame) -> tuple[tk.Canvas, ttk.Frame]:
         canvas = tk.Canvas(parent, highlightthickness=0)
@@ -356,6 +503,39 @@ class TruthEditor(tk.Tk):
             selected = truth_path
         self.load_file(selected)
 
+    def _new_csv_row(self) -> dict[str, str]:
+        return {field: "" for field in self.fieldnames}
+
+    def _ensure_page_rows(self) -> None:
+        needed = {"record_type", "product_id", "title", "description"}
+        if not needed.issubset(self.fieldnames):
+            missing = ", ".join(sorted(needed.difference(self.fieldnames)))
+            raise ValueError(f"truth.csv is missing page-content columns: {missing}")
+
+        existing: dict[tuple[str, str], int] = {}
+        for index, row in enumerate(self.rows):
+            if row.get("record_type") != "page_text":
+                continue
+            page_key = (row.get("product_id") or "").strip().lower()
+            field_key = (row.get("title") or "").strip()
+            if page_key and field_key:
+                existing[(page_key, field_key)] = index
+
+        for page_key, definitions in PAGE_FIELDS.items():
+            for field_key, _label, _multiline, default in definitions:
+                key = (page_key, field_key)
+                if key in existing:
+                    continue
+                row = self._new_csv_row()
+                row["record_type"] = "page_text"
+                row["product_id"] = page_key
+                row["title"] = field_key
+                row["description"] = default
+                self.rows.append(row)
+                existing[key] = len(self.rows) - 1
+
+        self.page_row_indices = existing
+
     def load_file(self, path: Path) -> None:
         try:
             with path.open("r", encoding="utf-8-sig", newline="") as handle:
@@ -364,6 +544,7 @@ class TruthEditor(tk.Tk):
                     raise ValueError("CSV has no header row")
                 self.fieldnames = list(reader.fieldnames)
                 self.rows = [dict(row) for row in reader]
+            self._ensure_page_rows()
         except Exception as exc:
             messagebox.showerror("Could not open CSV", str(exc))
             return
@@ -386,6 +567,7 @@ class TruthEditor(tk.Tk):
             self.block_list.insert("end", f"{position:02d}  {title}")
 
         self._load_global_fields()
+        self._load_page_fields()
         self.block_list.selection_set(0)
         self.block_list.activate(0)
         self._load_block(0)
@@ -404,6 +586,25 @@ class TruthEditor(tk.Tk):
         for field, entry in self.global_entries.items():
             if field in self.fieldnames:
                 first[field] = entry.get()
+
+    def _load_page_fields(self) -> None:
+        for (page_key, field_key), widget in self.page_entries.items():
+            row_index = self.page_row_indices.get((page_key, field_key))
+            value = self.rows[row_index].get("description", "") if row_index is not None else ""
+            if isinstance(widget, tk.Text):
+                widget.delete("1.0", "end")
+                widget.insert("1.0", value)
+            else:
+                widget.delete(0, "end")
+                widget.insert(0, value)
+
+    def _commit_page_fields(self) -> None:
+        for (page_key, field_key), widget in self.page_entries.items():
+            row_index = self.page_row_indices.get((page_key, field_key))
+            if row_index is None:
+                continue
+            value = widget.get("1.0", "end-1c") if isinstance(widget, tk.Text) else widget.get()
+            self.rows[row_index]["description"] = value
 
     def _on_select_block(self, _: tk.Event) -> None:
         selection = self.block_list.curselection()
@@ -447,30 +648,27 @@ class TruthEditor(tk.Tk):
     def _commit_all(self) -> None:
         self._commit_block()
         self._commit_global_fields()
+        self._commit_page_fields()
 
     def _csv_text(self) -> str:
         self._commit_all()
         if not self.fieldnames or not self.rows:
             raise ValueError("No CSV is loaded.")
-        from io import StringIO
-
         buffer = StringIO(newline="")
-        writer = csv.DictWriter(buffer, fieldnames=self.fieldnames, extrasaction="ignore", lineterminator="\n")
+        writer = csv.DictWriter(
+            buffer,
+            fieldnames=self.fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(self.rows)
         return buffer.getvalue()
 
     def _write_text(self, destination: Path, text: str) -> bool:
         try:
-            destination.write_text(text, encoding="utf-8", newline="")
-        except TypeError:
-            # Python versions where Path.write_text has no newline parameter.
-            try:
-                with destination.open("w", encoding="utf-8", newline="") as handle:
-                    handle.write(text)
-            except OSError as exc:
-                messagebox.showerror("Could not save CSV", str(exc))
-                return False
+            with destination.open("w", encoding="utf-8", newline="") as handle:
+                handle.write(text)
         except OSError as exc:
             messagebox.showerror("Could not save CSV", str(exc))
             return False
@@ -564,7 +762,7 @@ class TruthEditor(tk.Tk):
         confirmed = messagebox.askyesno(
             "Revert portfolio?",
             "This will replace ALL current truth.csv edits with standard.csv, "
-            "save the reset locally, and publish the reset to GitHub.\n\nContinue?",
+            "restore the standard page copy, save the reset locally, and publish it to GitHub.\n\nContinue?",
         )
         if not confirmed:
             return
@@ -576,15 +774,18 @@ class TruthEditor(tk.Tk):
             if not self._write_text(destination, standard_text):
                 return
             self.load_file(destination)
-            commit = self._publish_text(standard_text, "Revert portfolio content to standard.csv")
+            reset_text = self._csv_text()
+            if not self._write_text(destination, reset_text):
+                return
+            commit = self._publish_text(reset_text, "Revert portfolio content to standard.csv")
             self.status_text.set("Standard restored and published")
             messagebox.showinfo(
                 "Reverted",
-                "truth.csv now matches standard.csv locally and on GitHub.\n\n"
+                "truth.csv has been restored to the standard portfolio copy and published.\n\n"
                 f"Commit: {commit[:12] if commit else 'created'}\n"
                 "GitHub Actions will redeploy the standard version automatically.",
             )
-        except (GithubFailure, OSError) as exc:
+        except (GithubFailure, OSError, ValueError) as exc:
             self.status_text.set("Revert failed")
             messagebox.showerror("Could not revert", str(exc))
 
