@@ -31,10 +31,60 @@ function parseCsv(text) {
     .map((r, i) => ({ ...r, __line: i + 2 }));
 }
 
+const PAGE_DEFAULTS = {
+  acting: {
+    title: "ACTING",
+    kicker: "Performance",
+    body: "Selected acting work, performance credits, and material can live here. Replace this text with the work you want visitors to see.",
+  },
+  design: {
+    title: "DESIGN",
+    kicker: "Scenic & Visual Work",
+    body: "A space for design practice, selected productions, visual research, process notes, and the work behind the finished scene.",
+  },
+  contact: {
+    title: "CONTACT",
+    kicker: "Get in touch",
+    body: "For collaborations, production inquiries, and creative work, send a message.",
+    email: "hello@example.com",
+  },
+  resume: {
+    intro_title: "RESUME",
+    intro_hint: "Scroll back up anytime",
+    name: "QUANDRANEA M. MAYBE",
+    headline: "Scene Designer & Keeper of Improbable Rooms",
+    location: "Somewhere just offstage",
+    email: "hello@example.com",
+    availability: "Available after intermission",
+    profile_heading: "Profile",
+    profile: "Scene designer with a fondness for theatrical architecture, impossible entrances, practical illusions, and making a perfectly normal chair feel suspicious.",
+    experience_heading: "Experience",
+    experience_1_role: "Lead Scene Designer",
+    experience_1_dates: "2024–Present",
+    experience_1_place: "The Department of Dramatic Entrances",
+    experience_1_bullets: "Designed rooms that looked expensive while remaining legally just plywood.\nCoordinated scenic builds, paint treatments, prop logic, and audience sightlines.\nReduced emergency fog-machine diplomacy by a statistically meaningful amount.",
+    experience_2_role: "Assistant Scenic Designer",
+    experience_2_dates: "2022–2024",
+    experience_2_place: "The Very Serious Players",
+    experience_2_bullets: "Prepared drafting packages, research boards, models, and production notes.\nTracked scenic changes through rehearsals without losing the one important stool.\nMaintained calm when someone said “what if the wall simply flew away?”",
+    credits_heading: "Selected Credits",
+    credits: "The Chair That Knew Too Much — Scenic Design\nThree Doors, No Exit, One Snack Table — Scenic Design\nA Respectable Amount of Fog — Associate Designer\nHamlet, But the Couch Is Important — Assistant Designer",
+    education_heading: "Education",
+    education_degree: "B.F.A., Theatre Design",
+    education_year: "2022",
+    education_school: "University of Extremely Specific Curtains",
+    skills_heading: "Skills",
+    skills: "Scenic design · drafting · model making · visual research · paint elevations · production collaboration · Vectorworks-adjacent confidence · emergency glitter containment",
+    references_heading: "References",
+    references: "Available upon request, assuming the stage manager has forgiven me.",
+  },
+};
+
 const allRows = parseCsv(await readText("truth.csv"));
 const rows = allRows.filter((r) => !r.record_type || r.record_type === "block");
 const fontRows = allRows.filter((r) => r.record_type === "font_rule");
 const colorRows = allRows.filter((r) => r.record_type === "color_rule");
+const pageRows = allRows.filter((r) => r.record_type === "page_text");
 if (rows.length !== 10) throw new Error(`truth.csv must contain exactly 10 block rows; found ${rows.length}`);
 
 const ids = rows.map((r) => r.product_id);
@@ -89,6 +139,16 @@ const colorRules = colorRows
     return { scope, product_id: productId, color };
   });
 
+const pages = structuredClone(PAGE_DEFAULTS);
+for (const row of pageRows) {
+  const pageKey = row.product_id?.trim().toLowerCase();
+  const fieldKey = row.title?.trim();
+  if (!pageKey || !fieldKey) throw new Error(`truth.csv line ${row.__line}: page_text rows require product_id=page key and title=field key`);
+  if (!(pageKey in pages)) throw new Error(`truth.csv line ${row.__line}: unknown page ${pageKey}`);
+  if (!(fieldKey in pages[pageKey])) throw new Error(`truth.csv line ${row.__line}: unknown ${pageKey} page field ${fieldKey}`);
+  pages[pageKey][fieldKey] = row.description ?? "";
+}
+
 const first = rows[0];
 const site = {
   row_heading: first.row_heading || "Quandranea",
@@ -135,7 +195,7 @@ const blocks = rows.sort((a, b) => Number(a.order) - Number(b.order)).map((r) =>
   };
 });
 
-const truth = { schema_version: "1.2.0", generated_from: "truth.csv", site, blocks };
+const truth = { schema_version: "1.3.0", generated_from: "truth.csv", site, blocks, pages };
 await writeJson("data/truth.generated.json", truth);
 
 const catalogPaths = ["data/catalogs/nume-marketplace.v1.json", "data/catalog-sync/published-marketplace.v1.json"];
@@ -177,4 +237,4 @@ for (const layoutPath of layoutPaths) {
   await writeJson(layoutPath, layout);
 }
 
-console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${site.header_nav.length} nav links, ${fontRules.length} active font rules, ${colorRules.length} active color rules.`);
+console.log(`Generated portfolio data from truth.csv: ${blocks.length} blocks, ${site.header_nav.length} nav links, ${fontRules.length} active font rules, ${colorRules.length} active color rules, ${pageRows.length} page text overrides.`);
