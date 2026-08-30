@@ -13,7 +13,15 @@ type FontRule = {
   fallback?: string;
 };
 
-const fontRules = ((truthData.site as unknown as { font_rules?: FontRule[] }).font_rules ?? []);
+type ColorRule = {
+  scope: string;
+  product_id?: string;
+  color: string;
+};
+
+const siteStyles = truthData.site as unknown as { font_rules?: FontRule[]; color_rules?: ColorRule[] };
+const fontRules = siteStyles.font_rules ?? [];
+const colorRules = siteStyles.color_rules ?? [];
 
 function resolvedHref(value: string) {
   if (!value) return "";
@@ -35,10 +43,10 @@ function cssEscape(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
-function fontSelectors(rule: FontRule) {
-  const id = rule.product_id ? cssEscape(rule.product_id) : "";
+function textSelectors(scope: string, productId = "") {
+  const id = productId ? cssEscape(productId) : "";
   const selectedPrefix = id ? `.nume[data-truth-product-id="${id}"] ` : "";
-  switch (rule.scope) {
+  switch (scope) {
     case "brand": return [".truth-wordmark"];
     case "nav": return [".truth-nav a"];
     case "row_heading": return ['.gallery-row[data-nume-row="row_nume_objects"] .merchant-title'];
@@ -65,20 +73,28 @@ function fontSelectors(rule: FontRule) {
       return [`${selectedPrefix}.demo-checkout`];
     case "footer": return [".truth-footer"];
     case "footer_social": return [".truth-socials"];
-    case "section_title": return [".portfolio-section h1"];
+    case "section_title": return [".portfolio-section h1", ".resume-intro h1"];
     default: return [];
   }
 }
 
 function fontCss(rules: FontRule[]) {
   return rules.flatMap((rule) => {
-    const selectors = fontSelectors(rule).filter(Boolean);
+    const selectors = textSelectors(rule.scope, rule.product_id).filter(Boolean);
     if (!selectors.length || !rule.family) return [];
     const family = rule.family.replace(/'/g, "\\'");
     const fallback = (rule.fallback || "sans-serif").replace(/[;{}]/g, "");
     const weight = /^(?:[1-9]00)$/.test(rule.weight || "") ? rule.weight : "400";
     const style = rule.style === "italic" ? "italic" : "normal";
     return `${selectors.join(",\n")} { font-family: '${family}', ${fallback} !important; font-weight: ${weight} !important; font-style: ${style} !important; }`;
+  }).join("\n");
+}
+
+function colorCss(rules: ColorRule[]) {
+  return rules.flatMap((rule) => {
+    const selectors = textSelectors(rule.scope, rule.product_id).filter(Boolean);
+    if (!selectors.length || !/^#[0-9a-fA-F]{3,8}$/.test(rule.color)) return [];
+    return `${selectors.join(",\n")} { color: ${rule.color} !important; }`;
   }).join("\n");
 }
 
@@ -108,8 +124,8 @@ export function TruthChrome() {
     }
 
     const style = document.createElement("style");
-    style.dataset.truthFontRules = "true";
-    style.textContent = fontCss(fontRules);
+    style.dataset.truthStyleRules = "true";
+    style.textContent = `${fontCss(fontRules)}\n${colorCss(colorRules)}`;
     document.head.appendChild(style);
 
     const applyTruthCopy = () => {
