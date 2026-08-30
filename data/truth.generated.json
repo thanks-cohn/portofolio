@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "generated_from": "truth.csv",
+  "site": {
+    "row_heading": "Quandranea",
+    "row_subheader": "Scene Designer",
+    "brand_top": "Q",
+    "brand_bottom": "M",
+    "header_nav": [
+      { "label": "HOME", "url": "/" },
+      { "label": "ACTING", "url": "/acting" },
+      { "label": "DESIGN", "url": "/design" },
+      { "label": "RESUME", "url": "/resume" },
+      { "label": "CONTACT", "url": "/contact" }
+    ],
+    "footer_left": "Quandrnea - 2026",
+    "details_label": "Project details",
+    "visit_label": "Visit project",
+    "preview_header": "Project Preview",
+    "preview_source_prefix": "Quandranea / PROJECT",
+    "preview_note": "Portfolio project preview"
+  },
+  "blocks": [
+    { "product_id": "product_nume_objects_01", "order": 1, "title": "Column Table Lamp", "description": "Column Table Lamp is compact architectural table lamp that casts a focused pool of warm task light.", "price_minor": 5200, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Column Table Lamp", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_02", "order": 2, "title": "Arc Bookend Pair", "description": "Arc Bookend Pair is weighty geometric bookends designed to organize a shelf with sculptural clarity.", "price_minor": 7600, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Arc Bookend Pair", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_03", "order": 3, "title": "Grid Catchall Tray", "description": "Grid Catchall Tray is low-profile catchall tray for keys and desk tools finished in a calm stone tone.", "price_minor": 8800, "currency": "usd", "availability": "low_stock", "image_url": "https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Grid Catchall Tray", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_04", "order": 4, "title": "Volume Ceramic Cup", "description": "Volume Ceramic Cup is glazed ceramic mug with a comfortable handle and a playful high-contrast finish.", "price_minor": 4200, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Volume Ceramic Cup", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_05", "order": 5, "title": "Plane Desk Mat", "description": "Plane Desk Mat is generous desk mat with a smooth work surface and precisely finished edges.", "price_minor": 5800, "currency": "usd", "availability": "sold_out", "image_url": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Plane Desk Mat", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_06", "order": 6, "title": "Index Steel Bottle", "description": "Index Steel Bottle is reusable steel bottle with a leak-resistant cap and a brushed metallic body.", "price_minor": 9600, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Index Steel Bottle", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_07", "order": 7, "title": "Halo Incense Stand", "description": "Halo Incense Stand is minimal incense holder designed to catch ash in a compact sculptural dish.", "price_minor": 3400, "currency": "usd", "availability": "temporarily_unavailable", "image_url": "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Halo Incense Stand", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_08", "order": 8, "title": "Fold Canvas Basket", "description": "Fold Canvas Basket is foldable canvas basket with reinforced seams for calm flexible home storage.", "price_minor": 4800, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Fold Canvas Basket", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_09", "order": 9, "title": "Relay Wall Clock", "description": "Relay Wall Clock is quiet wall clock with bold hands and a highly legible architectural face.", "price_minor": 6400, "currency": "usd", "availability": "low_stock", "image_url": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Relay Wall Clock", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" },
+    { "product_id": "product_nume_objects_10", "order": 10, "title": "Form Wool Cushion", "description": "Form Wool Cushion is wool-blend cushion with a tactile weave and supportive feather-soft fill.", "price_minor": 3800, "currency": "usd", "availability": "available", "image_url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85", "image_alt": "Refined studio and lifestyle object photograph selected for Form Wool Cushion", "destination_label": "Visit project", "destination_url": "", "footer_icon_ref": "", "footer_icon_label": "", "footer_icon_url": "" }
+  ]
+}
