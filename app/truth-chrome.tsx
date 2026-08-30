@@ -36,7 +36,9 @@ function selectedBlock() {
 }
 
 function setText(selector: string, value: string) {
-  document.querySelectorAll<HTMLElement>(selector).forEach((node) => { node.textContent = value; });
+  document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
+    if (node.textContent !== value) node.textContent = value;
+  });
 }
 
 function cssEscape(value: string) {
@@ -141,12 +143,22 @@ export function TruthChrome() {
       const indexText = document.querySelector<HTMLElement>(".hero-index, .mobile-hero-index")?.textContent?.trim() || "";
       document.querySelectorAll<HTMLElement>(".preview-page").forEach((page) => {
         const source = Array.from(page.children).find((child) => child.tagName === "SPAN" && !child.classList.contains("demo-checkout")) as HTMLElement | undefined;
-        if (source) source.textContent = `${truthData.site.preview_source_prefix} ${indexText}`.trim();
+        const nextSource = `${truthData.site.preview_source_prefix} ${indexText}`.trim();
+        if (source && source.textContent !== nextSource) source.textContent = nextSource;
       });
       setText(".demo-checkout", truthData.site.preview_note);
     };
 
-    const observer = new MutationObserver(applyTruthCopy);
+    let frame = 0;
+    const scheduleTruthCopy = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        applyTruthCopy();
+      });
+    };
+
+    const observer = new MutationObserver(scheduleTruthCopy);
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
     applyTruthCopy();
 
@@ -166,6 +178,7 @@ export function TruthChrome() {
 
     return () => {
       observer.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
       document.removeEventListener("click", redirect, true);
       style.remove();
       fontLinks.forEach((link) => link.remove());
