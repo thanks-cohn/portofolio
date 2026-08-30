@@ -1,0 +1,35 @@
+record_type,product_id,order,row_heading,row_subheader,brand_top,brand_bottom,nav_home_label,nav_home_url,nav_acting_label,nav_acting_url,nav_design_label,nav_design_url,nav_resume_label,nav_resume_url,nav_contact_label,nav_contact_url,footer_left,details_label,visit_label,preview_header,preview_source_prefix,preview_note,title,description,price_minor,currency,availability,image_url,image_alt,destination_label,destination_url,footer_icon_ref,footer_icon_label,footer_icon_url,font_scope,font_product_id,google_font,font_weight,font_style,font_fallback,color_scope,color_product_id,text_color
+block,product_nume_objects_01,1,Quandranea,Scene Designer,Q,M,HOME,/,ACTING,/acting,DESIGN,/design,RESUME,/resume,CONTACT,/contact,Quandrnea - 2026,Project details,Visit project,Project Preview,Quandranea / PROJECT,Portfolio project preview,Column Table Lamp,Column Table Lamp is compact architectural table lamp that casts a focused pool of warm task light.,5200,usd,available,https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Column Table Lamp,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_02,2,,,,,,,,,,,,,,,,,,,,,Arc Bookend Pair,Arc Bookend Pair is weighty geometric bookends designed to organize a shelf with sculptural clarity.,7600,usd,available,https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Arc Bookend Pair,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_03,3,,,,,,,,,,,,,,,,,,,,,Grid Catchall Tray,Grid Catchall Tray is low-profile catchall tray for keys and desk tools finished in a calm stone tone.,8800,usd,low_stock,https://images.unsplash.com/photo-1519947486511-46149fa0a254?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Grid Catchall Tray,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_04,4,,,,,,,,,,,,,,,,,,,,,Volume Ceramic Cup,Volume Ceramic Cup is glazed ceramic mug with a comfortable handle and a playful high-contrast finish.,4200,usd,available,https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Volume Ceramic Cup,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_05,5,,,,,,,,,,,,,,,,,,,,,Plane Desk Mat,Plane Desk Mat is generous desk mat with a smooth work surface and precisely finished edges.,5800,usd,sold_out,https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Plane Desk Mat,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_06,6,,,,,,,,,,,,,,,,,,,,,Index Steel Bottle,Index Steel Bottle is reusable steel bottle with a leak-resistant cap and a brushed metallic body.,9600,usd,available,https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Index Steel Bottle,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_07,7,,,,,,,,,,,,,,,,,,,,,Halo Incense Stand,Halo Incense Stand is minimal incense holder designed to catch ash in a compact sculptural dish.,3400,usd,temporarily_unavailable,https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Halo Incense Stand,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_08,8,,,,,,,,,,,,,,,,,,,,,Fold Canvas Basket,Fold Canvas Basket is foldable canvas basket with reinforced seams for calm flexible home storage.,4800,usd,available,https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Fold Canvas Basket,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_09,9,,,,,,,,,,,,,,,,,,,,,Relay Wall Clock,Relay Wall Clock is quiet wall clock with bold hands and a highly legible architectural face.,6400,usd,low_stock,https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Relay Wall Clock,Visit project,,,,,,,,,,,,,
+block,product_nume_objects_10,10,,,,,,,,,,,,,,,,,,,,,Form Wool Cushion,Form Wool Cushion is wool-blend cushion with a tactile weave and supportive feather-soft fill.,3800,usd,available,https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85,Refined studio and lifestyle object photograph selected for Form Wool Cushion,Visit project,,,,,,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,brand,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,nav,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,row_heading,,Cormorant Garamond,600,normal,"Georgia, serif",,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,row_subheader,,Cormorant Garamond,400,italic,"Georgia, serif",,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_title,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_price,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,project_kicker,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,project_title,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,project_meta,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,project_description,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,action,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,preview_header,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,preview_source,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,preview_note,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,footer,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,footer_social,,,,,,,,
+font_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,section_title,,,,,,,,
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,brand,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,nav,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,row_heading,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,row_subheader,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_title,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,card_price,,#ff2bd6
+color_rule,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,footer,,#ff2bd6
