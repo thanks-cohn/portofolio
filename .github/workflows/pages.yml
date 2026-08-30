@@ -19,6 +19,8 @@ jobs:
         with: { node-version: "22", cache: npm }
       - uses: actions/configure-pages@v5
       - run: npm ci
+      - name: Generate site data from truth.csv
+        run: npm run truth:generate
       - run: npm run validate:catalog
       - run: npm run validate:targets
       - run: npm run build:pages
