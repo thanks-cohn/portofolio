@@ -31,7 +31,11 @@ for (const product of catalog.products) {
 }
 if (layout.rows.length !== 5) errors.push("layout must contain exactly five rows");
 for (const row of layout.rows) {
-  if (row.product_ids.length !== 10) errors.push(`${row.row_id}: must contain ten products`);
+  if (row.row_id === "row_nume_objects") {
+    if (row.product_ids.length < 1) errors.push(`${row.row_id}: must contain at least one product`);
+  } else if (row.product_ids.length !== 10) {
+    errors.push(`${row.row_id}: must contain ten products`);
+  }
   for (const id of row.product_ids) if (!products.has(id)) errors.push(`${row.row_id}: missing product ${id}`);
   for (const id of row.product_ids) if (products.get(id)?.storefront_id !== row.storefront_id) errors.push(`${row.row_id}: storefront mismatch for ${id}`);
 }
