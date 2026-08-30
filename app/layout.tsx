@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { resolveAssetPath } from "../lib/asset-path.mjs";
 import "./globals.css";
+import "./middle-row-only.css";
 
 export const metadata: Metadata = {
   title: "NUME — Visual Index",
