@@ -144,7 +144,7 @@
   filter: grayscale(1);
 }
 
-/* Internal section pages: restrained spacing instead of oversized placeholder typography. */
+/* Internal pages use a restrained editorial composition instead of placeholder title cards. */
 .portfolio-section {
   min-height: calc(100vh - 70px);
   padding: 150px 8vw 120px;
@@ -153,8 +153,20 @@
   background: var(--black);
 }
 
+.portfolio-section-copy {
+  width: min(760px, 100%);
+  text-align: center;
+}
+
+.portfolio-section-copy > p:first-child {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font: 400 9px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
 .portfolio-section h1 {
-  max-width: 11ch;
   margin: 0;
   color: var(--ink);
   font-family: Georgia, serif;
@@ -163,6 +175,31 @@
   line-height: .95;
   letter-spacing: -.025em;
   text-align: center;
+}
+
+.portfolio-section-rule {
+  width: 44px;
+  height: 1px;
+  margin: 28px auto;
+  background: currentColor;
+  opacity: .28;
+}
+
+.portfolio-section-body {
+  max-width: 58ch;
+  margin: 0 auto;
+  color: #b4b2ad;
+  font: 400 14px/1.75 Arial, Helvetica, sans-serif;
+}
+
+.portfolio-section-link {
+  display: inline-block;
+  margin-top: 24px;
+  color: var(--ink);
+  font: 400 10px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
 }
 
 /* Resume opens as a title card, then naturally glides down to the document after a beat. */
@@ -356,6 +393,10 @@
 
   .portfolio-section h1 {
     font-size: clamp(42px, 17vw, 72px);
+  }
+
+  .portfolio-section-body {
+    font-size: 13px;
   }
 
   .resume-intro {
