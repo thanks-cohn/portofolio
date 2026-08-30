@@ -10,7 +10,7 @@
     },
     {
       "storefront_id": "storefront_numenume",
-      "display_name": "Venasi",
+      "display_name": "Quandranea",
       "slug": "venasi",
       "status": "active"
     },
@@ -72,7 +72,7 @@
       "row_id": "row_nume_objects",
       "storefront_id": "storefront_numenume",
       "entrepreneur_group_id": "group_numenume",
-      "title": "VENASI",
+      "title": "Quandranea",
       "position": 3,
       "style_profile_id": "style_nume_objects",
       "product_ids": [
@@ -87,7 +87,7 @@
         "product_nume_objects_09",
         "product_nume_objects_10"
       ],
-      "subtitle": "Architectural fashion and objects",
+      "subtitle": "Scene Designer",
       "heading_placement": "center",
       "heading_role": "primary"
     },
