@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
   description: `${truthData.site.row_heading} portfolio`,
   icons: {
-    icon: resolveAssetPath("/favicon.svg"),
-    shortcut: resolveAssetPath("/favicon.svg"),
+    icon: resolveAssetPath("/jester-cry-laugh.svg"),
+    shortcut: resolveAssetPath("/jester-cry-laugh.svg"),
   },
 };
 
