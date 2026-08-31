@@ -1,0 +1,77 @@
+{
+  "landing": {
+    "row_heading_font": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap"
+  },
+  "contact_email": "quandraneamouton@gmail.com",
+  "props": {
+    "title": "PROPS",
+    "kicker": "ARTIST / DESIGNER",
+    "body": "All things props. As a props artist and designer, I love bringing stories to life through creative, hands-on work, from building and painting to sourcing and designing.",
+    "sections": [
+      {
+        "order": 1,
+        "image_side": "left",
+        "image_url": "https://images.stockcake.com/public/4/e/e/4eec84aa-4ecd-48a1-a7de-065a48fe8923_large/backstage-theater-setup-stockcake.jpg",
+        "image_alt": "Theatre crew preparing a stage with props and technical equipment",
+        "image_link_url": "/project-a/",
+        "header": "CRAFTED FOR THE STAGE",
+        "subheader": "FROM OBJECT TO CHARACTER",
+        "body": "A prop begins as an object, but onstage it has to carry character, history, and intention. This work focuses on the details that make an object feel as though it truly belongs inside the world of the production.",
+        "header_tag": "h1",
+        "subheader_tag": "h3",
+        "body_tag": "p",
+        "header_color": "#f1eee7",
+        "subheader_color": "#b4b2ad",
+        "body_color": "#b4b2ad",
+        "header_font_url": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap",
+        "subheader_font_url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap",
+        "body_font_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap",
+        "header_size": "56",
+        "subheader_size": "18",
+        "body_size": "16"
+      },
+      {
+        "order": 2,
+        "image_side": "right",
+        "image_url": "https://images.stockcake.com/public/1/9/2/1929559a-380b-48a6-ab65-02d24e454950_small/backstage-theater-scene-stockcake.jpg",
+        "image_alt": "Backstage theatre preparation before a performance",
+        "image_link_url": "/project-b/",
+        "header": "MADE TO MOVE WITH THE STORY",
+        "subheader": "TEXTURE, SCALE, INTENTION",
+        "body": "The most convincing stage objects do more than fill space. Their materials, wear, scale, and silhouette support the action around them. Each choice is made to complement the performer and strengthen the visual language of the scene.",
+        "header_tag": "h1",
+        "subheader_tag": "h3",
+        "body_tag": "p",
+        "header_color": "#f1eee7",
+        "subheader_color": "#b4b2ad",
+        "body_color": "#b4b2ad",
+        "header_font_url": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap",
+        "subheader_font_url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap",
+        "body_font_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap",
+        "header_size": "56",
+        "subheader_size": "18",
+        "body_size": "16"
+      }
+    ]
+  },
+  "hidden_pages": [
+    {
+      "key": "project-a",
+      "name": "PROJECT A",
+      "path": "/project-a/",
+      "title": "PROJECT A",
+      "kicker": "PROP DESIGN",
+      "body": "A closer look at the making, materials, and theatrical decisions behind this project. This page is intentionally kept off the top navigation and is reached through the PROPS page.",
+      "show_in_nav": false
+    },
+    {
+      "key": "project-b",
+      "name": "PROJECT B",
+      "path": "/project-b/",
+      "title": "PROJECT B",
+      "kicker": "PROP DESIGN",
+      "body": "A closer look at the visual research, construction choices, and stage-ready details behind this project. This page is intentionally kept off the top navigation and is reached through the PROPS page.",
+      "show_in_nav": false
+    }
+  ]
+}
