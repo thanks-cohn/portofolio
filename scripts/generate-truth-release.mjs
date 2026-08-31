@@ -79,11 +79,28 @@ function cleanPageCopy(value) {
 }
 truth.pages = cleanPageCopy(truth.pages || {});
 
+// A font pasted into the desktop editor must override the seeded landing default.
+const headingFont = truth.text_fonts?.site?.row_heading;
+if (headingFont?.family) {
+  truth.site ||= {};
+  truth.site.font_rules ||= [];
+  let rule = truth.site.font_rules.find((item) => item.scope === "row_heading" && !item.product_id);
+  if (!rule) {
+    rule = { scope: "row_heading", family: headingFont.family, weight: "500", style: "normal", fallback: "Georgia, serif" };
+    truth.site.font_rules.push(rule);
+  } else {
+    rule.family = headingFont.family;
+    rule.weight = "500";
+    rule.style = "normal";
+    rule.fallback = "Georgia, serif";
+  }
+}
+
 // Top-menu display is always uppercase, but the words and editable labels remain intact.
 for (const item of truth.site?.header_nav || []) {
   item.label = String(item.label || "").toUpperCase();
 }
 
-truth.schema_version = "1.10.0";
+truth.schema_version = "1.10.1";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Applied click-through destinations, page-copy punctuation, and uppercase navigation.");
+console.log("Applied click-through destinations, page-copy punctuation, uppercase navigation, and landing-font override support.");
