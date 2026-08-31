@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import truthData from "../data/truth.generated.json";
 import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
+import { QSiteEditor } from "./q-site-editor";
 import "./globals.css";
 import "./middle-row-only.css";
 import "./editorial-overrides.css";
+import "./q-site-editor.css";
 
 export const metadata: Metadata = {
   title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
@@ -25,6 +27,7 @@ export default function RootLayout({
       <body>
         {children}
         <TruthChrome />
+        <QSiteEditor />
       </body>
     </html>
   );
