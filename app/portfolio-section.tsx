@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import truthData from "../data/truth.generated.json";
 
-type SectionKey = "ACTING" | "DESIGN" | "CONTACT";
 type TextTag = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 type TextStyle = {
@@ -44,6 +43,8 @@ type EditablePage = {
   kicker: string;
   body: string;
   email?: string;
+  path?: string;
+  custom?: boolean;
   style?: PageStyle;
   sections?: PageSection[];
 };
@@ -132,9 +133,12 @@ function TextElement({
   }
 }
 
-export function PortfolioSection({ section }: { section: SectionKey }) {
-  const key = section.toLowerCase() as "acting" | "design" | "contact";
-  const page = truthData.pages[key] as unknown as EditablePage;
+export function PortfolioSection({ section }: { section: string }) {
+  const key = section.toLowerCase();
+  const pages = truthData.pages as unknown as Record<string, EditablePage>;
+  const page = pages[key];
+  if (!page) return null;
+
   const sections: PageSection[] = page.sections ?? [];
   const pageStyle = page.style ?? {};
   const titleStyle = pageStyle.title ?? {};
