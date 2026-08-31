@@ -1,0 +1,159 @@
+.q-site-hidden-file {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.q-site-orb {
+  position: fixed;
+  z-index: 9998;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(242, 240, 233, .9);
+  border-radius: 50%;
+  padding: 0;
+  background: #f1eee7;
+  color: #111;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .34);
+  font: 600 22px/1 Georgia, serif;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: opacity .45s ease, transform .2s ease, background .2s ease, color .2s ease;
+}
+
+.q-site-orb:active { cursor: grabbing; }
+.q-site-orb:hover,
+.q-site-orb:focus-visible {
+  opacity: 1 !important;
+  transform: scale(1.04);
+  outline: none;
+}
+.q-site-orb.is-faded { opacity: .11; }
+.q-site-orb.is-editing {
+  background: #111;
+  color: #f1eee7;
+  border-color: rgba(242, 240, 233, .58);
+}
+
+.q-site-menu {
+  position: fixed;
+  z-index: 10000;
+  width: 210px;
+  padding: 7px;
+  border: 1px solid rgba(242, 240, 233, .2);
+  background: rgba(10, 10, 10, .97);
+  color: #f1eee7;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .5);
+  backdrop-filter: blur(16px);
+}
+
+.q-site-menu button {
+  width: 100%;
+  border: 0;
+  padding: 10px 11px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: 500 10px/1.2 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+.q-site-menu button:hover,
+.q-site-menu button:focus-visible {
+  background: #f1eee7;
+  color: #111;
+  outline: none;
+}
+.q-site-menu button:disabled { opacity: .45; cursor: wait; }
+.q-site-menu-rule { height: 1px; margin: 5px 7px; background: rgba(242, 240, 233, .14); }
+.q-site-menu small {
+  display: block;
+  padding: 7px 11px 4px;
+  color: #777;
+  font: 400 9px/1.4 Arial, Helvetica, sans-serif;
+}
+
+.q-site-edit-panel {
+  position: fixed;
+  z-index: 10001;
+  right: 24px;
+  bottom: 24px;
+  width: min(430px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid rgba(242, 240, 233, .22);
+  background: rgba(10, 10, 10, .98);
+  color: #f1eee7;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, .56);
+  backdrop-filter: blur(18px);
+}
+.q-site-edit-panel strong {
+  display: block;
+  margin-bottom: 10px;
+  font: 600 10px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .16em;
+}
+.q-site-edit-panel input,
+.q-site-edit-panel textarea {
+  width: 100%;
+  border: 1px solid rgba(242, 240, 233, .25);
+  border-radius: 0;
+  padding: 11px 12px;
+  background: #151515;
+  color: #f1eee7;
+  font: 400 13px/1.55 Arial, Helvetica, sans-serif;
+  outline: none;
+  resize: vertical;
+}
+.q-site-edit-panel input:focus,
+.q-site-edit-panel textarea:focus { border-color: rgba(242, 240, 233, .72); }
+.q-site-edit-panel > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 11px;
+}
+.q-site-edit-panel button {
+  border: 1px solid rgba(242, 240, 233, .25);
+  padding: 8px 12px;
+  background: transparent;
+  color: #f1eee7;
+  font: 500 9px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+.q-site-edit-panel button:last-child { background: #f1eee7; color: #111; }
+
+.q-site-status {
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 24px;
+  max-width: min(560px, calc(100vw - 40px));
+  padding: 9px 13px;
+  border: 1px solid rgba(242, 240, 233, .18);
+  background: rgba(10, 10, 10, .92);
+  color: #b4b2ad;
+  transform: translateX(-50%);
+  font: 400 10px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+/* EDIT mode gets a restrained hover cue. READ ONLY adds no editing treatment. */
+body:has(.q-site-orb.is-editing) [data-q-edit] { cursor: text; }
+body:has(.q-site-orb.is-editing) img[data-q-edit="image"] { cursor: pointer; }
+body:has(.q-site-orb.is-editing) [data-q-edit]:hover {
+  outline: 1px dashed rgba(242, 240, 233, .5);
+  outline-offset: 5px;
+}
+
+@media (max-width: 700px) {
+  .q-site-orb { width: 48px; height: 48px; font-size: 19px; }
+  .q-site-edit-panel { right: 16px; bottom: 16px; }
+  .q-site-status { bottom: 16px; }
+}
