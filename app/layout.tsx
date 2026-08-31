@@ -4,6 +4,7 @@ import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
 import "./globals.css";
 import "./middle-row-only.css";
+import "./editorial-overrides.css";
 
 export const metadata: Metadata = {
   title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
