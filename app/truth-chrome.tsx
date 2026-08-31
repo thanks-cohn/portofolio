@@ -19,6 +19,12 @@ type ColorRule = {
   color: string;
 };
 
+type SocialLink = {
+  platform: "facebook" | "instagram" | "twitter" | string;
+  label: string;
+  url: string;
+};
+
 type TopicBlock = {
   product_id: string;
   destination_label?: string;
@@ -27,14 +33,49 @@ type TopicBlock = {
   location?: string;
 };
 
-const siteStyles = truthData.site as unknown as { font_rules?: FontRule[]; color_rules?: ColorRule[] };
+const siteStyles = truthData.site as unknown as {
+  font_rules?: FontRule[];
+  color_rules?: ColorRule[];
+  socials?: SocialLink[];
+};
 const fontRules = siteStyles.font_rules ?? [];
 const colorRules = siteStyles.color_rules ?? [];
+const socialLinks = siteStyles.socials ?? [];
 
 function resolvedHref(value: string) {
   if (!value) return "";
   if (/^(?:https?:)?\/\//i.test(value) || /^(?:mailto|tel):/i.test(value)) return value;
   return resolveAssetPath(value);
+}
+
+function SocialIcon({ platform }: { platform: string }) {
+  const key = platform.toLowerCase();
+  if (key === "facebook") {
+    return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 8.2h2.6V4.4c-.45-.06-1.98-.2-3.8-.2-3.75 0-6.32 2.29-6.32 6.5v3.63H2.5v4.25h4.18V24h5.13v-5.42h4.28l.68-4.25h-4.96v-3.2c0-1.23.34-2.93 2.39-2.93Z" fill="currentColor"/></svg>;
+  }
+  if (key === "instagram") {
+    return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="17.4" cy="6.7" r="1.1" fill="currentColor"/></svg>;
+  }
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 4.5 19.5 19.5M19.5 4.5 4.5 19.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
+}
+
+function SocialLinks({ className }: { className: string }) {
+  if (!socialLinks.length) return null;
+  return (
+    <span className={className}>
+      {socialLinks.map((social) => (
+        <a
+          key={`${social.platform}:${social.url}`}
+          href={resolvedHref(social.url)}
+          aria-label={social.label || social.platform}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <SocialIcon platform={social.platform} />
+        </a>
+      ))}
+    </span>
+  );
 }
 
 function selectedBlock() {
@@ -87,7 +128,7 @@ function textSelectors(scope: string, productId = "") {
     case "preview_note":
       return [`${selectedPrefix}.demo-checkout`];
     case "footer": return [".truth-footer"];
-    case "footer_social": return [".truth-socials"];
+    case "footer_social": return [".truth-socials", ".truth-header-socials"];
     case "section_title": return [".portfolio-section h1", ".resume-intro h1"];
     default: return [];
   }
@@ -152,8 +193,6 @@ export function TruthChrome() {
         else delete main.dataset.truthProductId;
       }
 
-      // The Quandranea row is content, not commerce. Replace NUME's inherited
-      // price/status text with optional generic section/location metadata.
       for (const rawBlock of truthData.blocks) {
         const topic = rawBlock as unknown as TopicBlock;
         const value = blockMeta(topic);
@@ -211,8 +250,6 @@ export function TruthChrome() {
     };
   }, []);
 
-  const socials = truthData.blocks.filter((block) => block.footer_icon_ref && block.footer_icon_url);
-
   return (
     <>
       <div className="truth-header" aria-label="Portfolio header">
@@ -225,21 +262,12 @@ export function TruthChrome() {
             <a key={`${item.label}:${item.url}`} href={resolvedHref(item.url)}>{item.label}</a>
           ))}
         </nav>
+        <SocialLinks className="truth-header-socials" />
       </div>
 
       <footer className="truth-footer">
         <span>{truthData.site.footer_left}</span>
-        <span className="truth-socials">
-          {socials.map((social) => {
-            const ref = social.footer_icon_ref;
-            const imageIcon = /^(?:https?:)?\/\//i.test(ref) || ref.startsWith("/") || ref.includes(".");
-            return (
-              <a key={`${social.product_id}:${social.footer_icon_url}`} href={resolvedHref(social.footer_icon_url)} aria-label={social.footer_icon_label || ref}>
-                {imageIcon ? <img src={resolvedHref(ref)} alt={social.footer_icon_label || ""} /> : <span aria-hidden="true">{ref}</span>}
-              </a>
-            );
-          })}
-        </span>
+        <SocialLinks className="truth-socials" />
       </footer>
     </>
   );
