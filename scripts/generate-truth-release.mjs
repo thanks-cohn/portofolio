@@ -67,6 +67,23 @@ if (accidentalAllHome) {
   console.log("Repaired accidental duplicated HOME labels on the fixed top-navigation pages.");
 }
 
-truth.schema_version = "1.8.0";
+// Page copy follows the requested punctuation style. Replace em dashes with a
+// simple spaced hyphen while leaving URLs, routes, and non-page data alone.
+function cleanPageCopy(value) {
+  if (typeof value === "string") return value.replace(/\s*—\s*/g, " - ");
+  if (Array.isArray(value)) return value.map(cleanPageCopy);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cleanPageCopy(item)]));
+  }
+  return value;
+}
+truth.pages = cleanPageCopy(truth.pages || {});
+
+// Top-menu display is always uppercase, but the words and editable labels remain intact.
+for (const item of truth.site?.header_nav || []) {
+  item.label = String(item.label || "").toUpperCase();
+}
+
+truth.schema_version = "1.10.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Applied click-through destinations to editorial page-section images.");
+console.log("Applied click-through destinations, page-copy punctuation, and uppercase navigation.");
