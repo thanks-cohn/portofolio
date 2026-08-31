@@ -16,8 +16,8 @@
       {
         "order": 1,
         "image_side": "left",
-        "image_url": "https://images.stockcake.com/public/4/e/e/4eec84aa-4ecd-48a1-a7de-065a48fe8923_large/backstage-theater-setup-stockcake.jpg",
-        "image_alt": "Theatre crew preparing a stage with props and technical equipment",
+        "image_url": "https://images.unsplash.com/photo-1661697522358-ca78f11d1d62?auto=format&fit=crop&w=2400&q=85",
+        "image_alt": "Theatre tools and production materials arranged on a work surface",
         "image_link_url": "/project-a/",
         "header": "CRAFTED FOR THE STAGE",
         "subheader": "FROM OBJECT TO CHARACTER",
@@ -38,8 +38,8 @@
       {
         "order": 2,
         "image_side": "right",
-        "image_url": "https://images.stockcake.com/public/1/9/2/1929559a-380b-48a6-ab65-02d24e454950_small/backstage-theater-scene-stockcake.jpg",
-        "image_alt": "Backstage theatre preparation before a performance",
+        "image_url": "https://images.unsplash.com/photo-1764763179996-565fab125433?auto=format&fit=crop&w=2400&q=85",
+        "image_alt": "Actors performing on a theatre stage surrounded by scenic elements and props",
         "image_link_url": "/project-b/",
         "header": "MADE TO MOVE WITH THE STORY",
         "subheader": "TEXTURE, SCALE, INTENTION",
@@ -62,21 +62,97 @@
   "hidden_pages": [
     {
       "key": "project-a",
-      "name": "PROJECT A",
+      "name": "BIG LOVE",
       "path": "/project-a/",
-      "title": "PROJECT A",
+      "title": "BIG LOVE",
       "kicker": "PROP DESIGN",
-      "body": "A closer look at the making, materials, and theatrical decisions behind this project. This page is intentionally kept off the top navigation and is reached through the PROPS page.",
-      "show_in_nav": false
+      "body": "A closer look at theatrical objects as carriers of memory, movement, and mood. The project is presented as a sequence of material choices, performer interactions, and stage-ready details.",
+      "show_in_nav": false,
+      "sections": [
+        {
+          "order": 1,
+          "image_side": "left",
+          "image_url": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Red theatre curtain before a performance",
+          "header": "OBJECTS WITH A PAST",
+          "subheader": "WEAR, AGE, AND MEMORY",
+          "body": "Surface treatment can make a prop feel inherited, treasured, neglected, or newly acquired. Color, distressing, and finish are used to suggest a history before the object ever enters the scene."
+        },
+        {
+          "order": 2,
+          "image_side": "right",
+          "image_url": "https://images.unsplash.com/photo-1630050525402-06c617847d27?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Performers rehearsing together on a theatre stage",
+          "header": "BUILT FOR THE PERFORMER",
+          "subheader": "WEIGHT, GRIP, MOVEMENT",
+          "body": "A stage object has to work in motion. Its weight, balance, edges, and handling all matter, especially when a performer repeats the same action night after night. The design supports the actor without drawing attention away from the moment."
+        },
+        {
+          "order": 3,
+          "image_side": "left",
+          "image_url": "https://images.unsplash.com/photo-1686216607642-dfc241092ab0?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Small theatre stage framed by curtains",
+          "header": "READING ACROSS THE ROOM",
+          "subheader": "SILHOUETTE AND SCALE",
+          "body": "Theatre asks an object to communicate from a distance. Strong silhouette, deliberate scale, and clean visual hierarchy help a prop remain legible from the front row to the back of the house."
+        },
+        {
+          "order": 4,
+          "image_side": "right",
+          "image_url": "https://images.unsplash.com/photo-1677497533660-adca109c2f71?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Large theatre lighting rig glowing blue above a stage",
+          "header": "FINISHED UNDER LIGHT",
+          "subheader": "COLOR, SHEEN, CONTRAST",
+          "body": "A finish changes once it meets stage light. Gloss can flare, dark paint can disappear, and subtle color can become unexpectedly vivid. Final choices are judged in the lighting environment where the object will actually live."
+        }
+      ]
     },
     {
       "key": "project-b",
-      "name": "PROJECT B",
+      "name": "A SERVANT OF TWO MASTERS",
       "path": "/project-b/",
-      "title": "PROJECT B",
+      "title": "A SERVANT OF TWO MASTERS",
       "kicker": "PROP DESIGN",
-      "body": "A closer look at the visual research, construction choices, and stage-ready details behind this project. This page is intentionally kept off the top navigation and is reached through the PROPS page.",
-      "show_in_nav": false
+      "body": "A playful study of props as engines of timing, comedy, and character. The project balances visual clarity with the durability and precision needed for repeated stage action.",
+      "show_in_nav": false,
+      "sections": [
+        {
+          "order": 1,
+          "image_side": "left",
+          "image_url": "https://images.unsplash.com/photo-1661697522358-ca78f11d1d62?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Theatre production tools laid out for work",
+          "header": "COMEDY NEEDS PRECISION",
+          "subheader": "PROPS THAT LAND ON CUE",
+          "body": "Comic business depends on consistency. Handles need to sit where the hand expects them, lids need to open cleanly, and breakaway or repeated actions need to reset without slowing the rhythm of the scene."
+        },
+        {
+          "order": 2,
+          "image_side": "right",
+          "image_url": "https://images.unsplash.com/photo-1615659527244-4cfeb740350a?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Black and white view of a theatre stage set under construction",
+          "header": "A WORLD WITH RULES",
+          "subheader": "PERIOD, SHAPE, RHYTHM",
+          "body": "Even playful props need to belong to the same visual world. Proportion, material, and decorative language are kept consistent so the comedy can become exaggerated without the stage picture becoming random."
+        },
+        {
+          "order": 3,
+          "image_side": "left",
+          "image_url": "https://images.unsplash.com/photo-1764763179996-565fab125433?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Actors working with scenic elements and props during a performance",
+          "header": "MADE TO BE HANDLED",
+          "subheader": "DURABLE, SAFE, BELIEVABLE",
+          "body": "The object has to survive rehearsal, performance, quick changes, and repeated contact while still looking convincing. Construction is planned around both the audience view and the practical demands of the performer."
+        },
+        {
+          "order": 4,
+          "image_side": "right",
+          "image_url": "https://images.unsplash.com/photo-1771911654088-36080143c3bd?auto=format&fit=crop&w=2400&q=85",
+          "image_alt": "Empty theatre auditorium facing an illuminated stage",
+          "header": "FROM TABLE TO STAGE",
+          "subheader": "FINAL PLACEMENT AND SIGHTLINES",
+          "body": "The last decisions happen in the room. A prop may shift position, gain contrast, or simplify once it is seen against the full set. Placement is refined so the object supports the action and reads clearly without competing with it."
+        }
+      ]
     }
   ]
 }
