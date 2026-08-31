@@ -40,6 +40,15 @@ function protectQFromFooter() {
 
 export function QSiteMarkers() {
   useEffect(() => {
+    let protectFrame = 0;
+    const scheduleProtect = () => {
+      if (protectFrame) return;
+      protectFrame = window.requestAnimationFrame(() => {
+        protectFrame = 0;
+        protectQFromFooter();
+      });
+    };
+
     const apply = () => {
       mark(document.querySelector('.gallery-row[data-nume-row="row_nume_objects"] .merchant-title'), {
         record: "global",
@@ -100,7 +109,7 @@ export function QSiteMarkers() {
         }
       }
 
-      protectQFromFooter();
+      scheduleProtect();
     };
 
     apply();
@@ -111,12 +120,15 @@ export function QSiteMarkers() {
       attributes: true,
       attributeFilter: ["class", "data-truth-product-id"],
     });
-    window.addEventListener("scroll", protectQFromFooter, { passive: true });
-    window.addEventListener("resize", protectQFromFooter, { passive: true });
+    window.addEventListener("scroll", scheduleProtect, { passive: true });
+    window.addEventListener("resize", scheduleProtect, { passive: true });
+    window.addEventListener("pointermove", scheduleProtect, { passive: true });
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", protectQFromFooter);
-      window.removeEventListener("resize", protectQFromFooter);
+      if (protectFrame) window.cancelAnimationFrame(protectFrame);
+      window.removeEventListener("scroll", scheduleProtect);
+      window.removeEventListener("resize", scheduleProtect);
+      window.removeEventListener("pointermove", scheduleProtect);
     };
   }, []);
 
