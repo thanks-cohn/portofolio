@@ -21,6 +21,8 @@ from portfolio_builder_visual import (
     VisualPortfolioBuilder,
 )
 
+DISPLAY_SIZE_CHOICES = ["Default", *SIZE_CHOICES]
+
 
 class FinalVisualPortfolioBuilder(VisualPortfolioBuilder):
     def _build_ui(self) -> None:
@@ -64,8 +66,6 @@ class FinalVisualPortfolioBuilder(VisualPortfolioBuilder):
         media_holder.pack(fill="x", before=first_child, pady=(0, 8))
 
         location_holder = ttk.Frame(block_inner)
-        # Packing this before the original first field naturally places it
-        # after the media_holder that was inserted first.
         location_holder.pack(fill="x", before=first_child, pady=(0, 10))
         ttk.Label(location_holder, text="R2 location override (optional)").pack(anchor="w")
         block_r2 = ttk.Entry(location_holder)
@@ -118,9 +118,9 @@ class FinalVisualPortfolioBuilder(VisualPortfolioBuilder):
         ttk.Combobox(
             parent,
             textvariable=size_var,
-            values=SIZE_CHOICES,
+            values=DISPLAY_SIZE_CHOICES,
             state="readonly",
-            width=8,
+            width=9,
         ).grid(row=1, column=2, sticky="w", padx=(0, 8))
 
         ttk.Label(parent, text="Google Font URL").grid(row=0, column=3, sticky="w")
@@ -137,7 +137,7 @@ class FinalVisualPortfolioBuilder(VisualPortfolioBuilder):
                 widget.configure(state="readonly")
 
         for widget in self.section_size_widgets.get(row_index, {}).values():
-            widget.configure(state="readonly")
+            widget.configure(values=DISPLAY_SIZE_CHOICES, state="readonly")
 
 
 def main() -> None:
