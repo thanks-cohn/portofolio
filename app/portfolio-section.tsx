@@ -22,6 +22,14 @@ type PageSection = {
   body_font_url: string;
 };
 
+type EditablePage = {
+  title: string;
+  kicker: string;
+  body: string;
+  email?: string;
+  sections?: PageSection[];
+};
+
 function googleFamily(url: string) {
   if (!url) return undefined;
   try {
@@ -50,11 +58,11 @@ function TextElement({ tag, text, color, fontUrl, className }: { tag: TextTag; t
 
 export function PortfolioSection({ section }: { section: SectionKey }) {
   const key = section.toLowerCase() as "acting" | "design" | "contact";
-  const page = truthData.pages[key];
-  const sections = ((page as unknown as { sections?: PageSection[] }).sections ?? []) as PageSection[];
-  const fontUrls = [...new Set(
+  const page = truthData.pages[key] as unknown as EditablePage;
+  const sections: PageSection[] = page.sections ?? [];
+  const fontUrls: string[] = [...new Set(
     sections
-      .flatMap((item) => [item.header_font_url, item.subheader_font_url, item.body_font_url])
+      .flatMap((item: PageSection) => [item.header_font_url, item.subheader_font_url, item.body_font_url])
       .filter((href): href is string => Boolean(href)),
   )];
 
@@ -66,14 +74,14 @@ export function PortfolioSection({ section }: { section: SectionKey }) {
         <h1>{page.title}</h1>
         <div className="portfolio-section-rule" aria-hidden="true" />
         <p className="portfolio-section-body">{page.body}</p>
-        {"email" in page && page.email ? (
+        {page.email ? (
           <a className="portfolio-section-link" href={`mailto:${page.email}`}>{page.email}</a>
         ) : null}
       </div>
 
       {sections.length ? (
         <div className="portfolio-builder-sections" aria-label={`${page.title} content`}>
-          {sections.map((item) => (
+          {sections.map((item: PageSection) => (
             <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
               <div className="portfolio-builder-image">
                 {item.image_url ? <img src={item.image_url} alt={item.image_alt || ""} /> : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
