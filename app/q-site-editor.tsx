@@ -19,7 +19,6 @@ type Draft = {
 };
 
 type Target = Draft & { element: HTMLElement };
-
 type CsvData = { header: string[]; rows: Record<string, string>[] };
 
 function draftId(draft: Omit<Draft, "value"> | Draft) {
@@ -47,9 +46,11 @@ function editableFromElement(element: HTMLElement): Target | null {
   const field = node.dataset.qField || "";
   const kind = node.dataset.qEdit as EditKind | undefined;
   if (!record || !field || (kind !== "text" && kind !== "image")) return null;
-  const value = kind === "image"
-    ? (node instanceof HTMLImageElement ? node.src : node.dataset.qValue || "")
-    : (node.textContent || "").trim();
+  const value = node.dataset.qValue !== undefined
+    ? node.dataset.qValue
+    : kind === "image" && node instanceof HTMLImageElement
+      ? (node.getAttribute("src") || node.src)
+      : (node.textContent || "").trim();
   return {
     element: node,
     record,
@@ -70,13 +71,18 @@ function applyDraftToDom(draft: Draft) {
     draft.order ? `[data-q-order="${CSS.escape(draft.order)}"]` : "",
   ].join("");
   document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
+    node.dataset.qValue = draft.value;
     if (draft.kind === "image" && node instanceof HTMLImageElement) {
-      if (node.src !== draft.value) node.src = draft.value;
+      if (node.getAttribute("src") !== draft.value) node.setAttribute("src", draft.value);
       return;
     }
     if (node.textContent !== draft.value) node.textContent = draft.value;
     if (node instanceof HTMLAnchorElement && draft.field === "email") node.href = `mailto:${draft.value}`;
   });
+}
+
+function applyAllDraftsToDom() {
+  Object.values(loadDrafts()).forEach(applyDraftToDom);
 }
 
 function parseCsv(text: string): CsvData {
@@ -246,10 +252,8 @@ export function QSiteEditor() {
   useEffect(() => {
     setPosition({ x: Math.max(16, window.innerWidth - 84), y: Math.max(16, window.innerHeight - 92) });
     scheduleFade();
-    const drafts = loadDrafts();
-    const apply = () => Object.values(drafts).forEach(applyDraftToDom);
-    apply();
-    const observer = new MutationObserver(apply);
+    applyAllDraftsToDom();
+    const observer = new MutationObserver(applyAllDraftsToDom);
     observer.observe(document.body, { childList: true, subtree: true });
     return () => {
       observer.disconnect();
@@ -278,8 +282,8 @@ export function QSiteEditor() {
 
   function saveEdit() {
     if (!target) return;
-    const draft: Draft = { ...target, value: editorValue };
-    delete (draft as Partial<Target>).element;
+    const { element: _element, ...draftBase } = target;
+    const draft: Draft = { ...draftBase, value: editorValue };
     const drafts = loadDrafts();
     drafts[draftId(draft)] = draft;
     saveDrafts(drafts);
@@ -351,6 +355,7 @@ export function QSiteEditor() {
       }
       localStorage.removeItem(DRAFT_KEY);
       setMode("readonly");
+      setTarget(null);
       setStatus("Published. The official site is redeploying.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Publish failed.");
@@ -386,7 +391,11 @@ export function QSiteEditor() {
         className="q-site-hidden-file"
         type="file"
         accept=".txt,text/plain"
-        onChange={(event) => tokenChosen(event.target.files?.[0])}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          void tokenChosen(file);
+          event.currentTarget.value = "";
+        }}
       />
 
       <button
@@ -403,7 +412,7 @@ export function QSiteEditor() {
         onContextMenu={(event) => {
           event.preventDefault();
           reveal();
-          setMenu({ x: event.clientX, y: event.clientY });
+          setMenu({ x: Math.min(event.clientX, window.innerWidth - 220), y: Math.min(event.clientY, window.innerHeight - 230) });
         }}
       >
         Q
