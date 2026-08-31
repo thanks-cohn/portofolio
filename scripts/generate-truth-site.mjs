@@ -40,6 +40,13 @@ for (const item of seed.hidden_pages || []) {
   }
 }
 
-truth.schema_version = "1.12.0";
+// Twitter/X was intentionally removed. Even if an older truth.csv still has a
+// stale row, only the two approved social profiles can reach the rendered site.
+truth.site ||= {};
+truth.site.socials = (truth.site.socials || []).filter((item) =>
+  ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
+);
+
+truth.schema_version = "1.12.1";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Applied DESIGN overview and hidden scenic project editorial sections.");
+console.log("Applied DESIGN overview, hidden scenic project sections, and Facebook/Instagram-only social links.");
