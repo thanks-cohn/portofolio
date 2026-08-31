@@ -21,13 +21,7 @@ from io import BytesIO
 from pathlib import Path
 from tkinter import filedialog, ttk
 
-from portfolio_builder import (
-    CONFIG_PATH,
-    GithubFailure,
-    PortfolioBuilder,
-    widget_get,
-    widget_set,
-)
+from portfolio_builder import CONFIG_PATH, PortfolioBuilder, widget_get, widget_set
 
 try:
     from PIL import Image, ImageTk  # type: ignore
@@ -65,12 +59,16 @@ class MediaPortfolioBuilder(PortfolioBuilder):
         self._media_config = config
         return config
 
+    def _config_value(self, name: str, default: str = "") -> str:
+        variable = getattr(self, name, None)
+        return variable.get().strip() if variable is not None else default
+
     def _save_config(self) -> None:
         data = {
             "token_location": self.token_location.get().strip() or "NULL",
-            "r2_token_location": getattr(self, "r2_token_location", tk.StringVar(value="NULL")).get().strip() or "NULL",
-            "r2_account_id": getattr(self, "r2_account_id", tk.StringVar(value="")).get().strip(),
-            "r2_public_base_url": getattr(self, "r2_public_base_url", tk.StringVar(value="")).get().strip(),
+            "r2_token_location": self._config_value("r2_token_location", "NULL") or "NULL",
+            "r2_account_id": self._config_value("r2_account_id"),
+            "r2_public_base_url": self._config_value("r2_public_base_url"),
         }
         CONFIG_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
@@ -106,7 +104,6 @@ class MediaPortfolioBuilder(PortfolioBuilder):
                 foreground="#666",
             ).grid(row=6, column=2, columnspan=2, sticky="w", padx=(8, 0), pady=(6, 0))
 
-        # Add a per-block R2 location immediately beneath the normal block fields.
         block_inner = self.block_entries["image_url"].master
         ttk.Separator(block_inner).pack(fill="x", pady=(18, 10))
         ttk.Label(block_inner, text="R2 bucket/location").pack(anchor="w", pady=(0, 4))
@@ -290,8 +287,11 @@ class MediaPortfolioBuilder(PortfolioBuilder):
         configured = self.r2_public_base_url.get().strip()
         if configured:
             return configured.replace("{bucket}", bucket).rstrip("/")
-        url = f"{self._r2_api_base(bucket)}/domains/managed"
-        payload = self._cf_request(url, expect_json=True)
+        try:
+            url = f"{self._r2_api_base(bucket)}/domains/managed"
+            payload = self._cf_request(url, expect_json=True)
+        except R2Failure:
+            return ""
         if isinstance(payload, dict) and payload.get("success"):
             result = payload.get("result") or {}
             domain = str(result.get("domain") or "").strip()
@@ -472,7 +472,8 @@ class MediaPortfolioBuilder(PortfolioBuilder):
         if Image is not None and ImageTk is not None:
             try:
                 image = Image.open(BytesIO(data))
-                image.thumbnail((1050, 650), Image.Resampling.LANCZOS)
+                resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS", getattr(Image, "ANTIALIAS", 1))
+                image.thumbnail((1050, 650), resampling)
                 photo = ImageTk.PhotoImage(image)
                 self._media_photo = photo
                 self.media_image_label.configure(image=photo, text="")
@@ -481,7 +482,6 @@ class MediaPortfolioBuilder(PortfolioBuilder):
             except Exception:
                 pass
 
-        # Native Tk supports PNG/GIF on common Tk 8.6 installations.
         try:
             encoded = base64.b64encode(data).decode("ascii")
             photo = tk.PhotoImage(data=encoded)
