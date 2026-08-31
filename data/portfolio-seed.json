@@ -3,6 +3,11 @@
     "row_heading_font": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap"
   },
   "contact_email": "quandraneamouton@gmail.com",
+  "socials": [
+    {"platform":"facebook","label":"Facebook","url":"https://www.facebook.com/"},
+    {"platform":"instagram","label":"Instagram","url":"https://www.instagram.com/"},
+    {"platform":"twitter","label":"Twitter / X","url":"https://x.com/"}
+  ],
   "props": {
     "title": "PROPS",
     "kicker": "ARTIST / DESIGNER",
