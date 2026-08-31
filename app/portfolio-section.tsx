@@ -59,6 +59,44 @@ function googleFamily(url: string) {
   }
 }
 
+function visualDefaults(className: string) {
+  if (className === "portfolio-section-title") {
+    return {
+      margin: 0,
+      fontFamily: "Georgia, serif",
+      fontSize: "clamp(46px, 7vw, 92px)",
+      fontWeight: 400,
+      lineHeight: 0.95,
+      letterSpacing: "-.025em",
+      textAlign: "center" as const,
+    };
+  }
+  if (className === "portfolio-section-kicker") {
+    return {
+      margin: "0 0 18px",
+      fontFamily: "Arial, Helvetica, sans-serif",
+      fontSize: "9px",
+      fontWeight: 400,
+      lineHeight: 1.4,
+      letterSpacing: ".2em",
+      textTransform: "uppercase" as const,
+      textAlign: "center" as const,
+    };
+  }
+  if (className === "portfolio-section-body") {
+    return {
+      maxWidth: "58ch",
+      margin: "0 auto",
+      fontFamily: "Arial, Helvetica, sans-serif",
+      fontSize: "14px",
+      fontWeight: 400,
+      lineHeight: 1.75,
+      textAlign: "center" as const,
+    };
+  }
+  return {};
+}
+
 function TextElement({
   tag,
   text,
@@ -76,9 +114,10 @@ function TextElement({
 }) {
   const family = googleFamily(fontUrl || "");
   const style = {
+    ...visualDefaults(className),
     color: color || undefined,
-    fontFamily: family ? `'${family}', sans-serif` : undefined,
-    fontSize: size ? `${size}px` : undefined,
+    fontFamily: family ? `'${family}', sans-serif` : visualDefaults(className).fontFamily,
+    fontSize: size ? `${size}px` : visualDefaults(className).fontSize,
   };
   switch (tag) {
     case "h1": return <h1 className={className} style={style}>{text}</h1>;
