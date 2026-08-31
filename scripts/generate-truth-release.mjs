@@ -35,8 +35,9 @@ const csvRows = parseCsv(await readFile(path.join(root, "truth.csv"), "utf8"));
 const first = csvRows.find((row) => !row.record_type || row.record_type === "block") || {};
 
 const homeLabel = (first.nav_home_label || "HOME").trim();
-const pageItems = (truth.site?.header_nav || []).filter((item) => item.page_key && item.page_key !== "home");
-const accidentalAllHome = pageItems.length >= 2 && homeLabel && pageItems.every(
+const fixedKeys = new Set(["acting", "design", "resume", "contact"]);
+const fixedItems = (truth.site?.header_nav || []).filter((item) => fixedKeys.has(item.page_key));
+const accidentalAllHome = fixedItems.length >= 2 && homeLabel && fixedItems.every(
   (item) => String(item.label || "").trim().toLowerCase() === homeLabel.toLowerCase(),
 );
 
@@ -47,9 +48,9 @@ if (accidentalAllHome) {
     resume: (first.nav_resume_label || "RESUME").trim(),
     contact: (first.nav_contact_label || "CONTACT").trim(),
   };
-  for (const item of pageItems) {
+  for (const item of fixedItems) {
     if (legacyLabels[item.page_key]) item.label = legacyLabels[item.page_key];
   }
   await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-  console.log("Repaired accidental duplicated HOME labels in generated top navigation.");
+  console.log("Repaired accidental duplicated HOME labels on the fixed top-navigation pages.");
 }
