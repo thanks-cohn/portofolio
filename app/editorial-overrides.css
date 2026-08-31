@@ -6,9 +6,10 @@
 }
 
 .truth-header-socials {
-  pointer-events: auto;
+  pointer-events: none;
   justify-self: end;
   padding-top: 0;
+  transition: transform .22s ease;
 }
 
 .truth-header-socials a,
@@ -20,6 +21,10 @@
   color: var(--muted);
   text-decoration: none;
   transition: color .2s ease, transform .2s ease;
+}
+
+.truth-header-socials a {
+  pointer-events: auto;
 }
 
 .truth-header-socials a:hover,
@@ -38,6 +43,38 @@
   max-width: 15px !important;
   max-height: 15px !important;
   display: block;
+}
+
+/* When the landing image opens, the original Back control occupies the far
+   right. Move social icons out of its space so the two hit areas never overlap. */
+.nume.is-open ~ .truth-header .truth-header-socials {
+  transform: translateX(-126px);
+}
+
+/* Portfolio cards are not commerce cards. Keep availability data internally,
+   but never paint SOLD OUT or PAUSED over the landing images. */
+.gallery-row[data-nume-row="row_nume_objects"] .tile.availability-sold_out::after,
+.gallery-row[data-nume-row="row_nume_objects"] .tile.availability-temporarily_unavailable::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Replace the old numeric hover counter with a short theatre quotation while
+   preserving the left/right row controls. */
+.gallery-row[data-nume-row="row_nume_objects"] .row-controls > span {
+  min-width: 176px;
+  font-size: 0;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.gallery-row[data-nume-row="row_nume_objects"] .row-controls > span::before {
+  content: "“All the world’s a stage.” · William Shakespeare";
+  display: block;
+  color: #b4b2ad;
+  font: 400 8px/1.25 Georgia, serif;
+  letter-spacing: .04em;
+  text-transform: none;
 }
 
 .portfolio-builder-image-link {
