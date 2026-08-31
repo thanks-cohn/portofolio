@@ -33,8 +33,10 @@
 
 .truth-header-socials svg,
 .truth-socials svg {
-  width: 15px;
-  height: 15px;
+  width: 15px !important;
+  height: 15px !important;
+  max-width: 15px !important;
+  max-height: 15px !important;
   display: block;
 }
 
@@ -61,8 +63,42 @@
   outline-offset: 4px;
 }
 
+/* Only the text paired with editorial images is centered. The page intro above
+   remains governed by its own independent styling controls. */
+.portfolio-builder-copy {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.portfolio-builder-header,
+.portfolio-builder-subheader,
+.portfolio-builder-body {
+  width: min(100%, 520px);
+  text-align: center;
+}
+
+.portfolio-builder-subheader {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.portfolio-builder-body {
+  max-width: 42ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (max-width: 900px) {
   .truth-header-socials {
     display: none;
+  }
+
+  .portfolio-builder-copy {
+    min-height: auto;
+    padding: 4px 10px 0;
   }
 }
