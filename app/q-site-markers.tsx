@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import truthData from "../data/truth.generated.json";
 
 function mark(
   node: Element | null,
@@ -34,6 +35,20 @@ export function QSiteMarkers() {
       mark(document.querySelector(".truth-wordmark span:first-child"), { record: "global", field: "brand_top" });
       mark(document.querySelector(".truth-wordmark span:last-child"), { record: "global", field: "brand_bottom" });
       mark(document.querySelector(".truth-footer > span:first-child"), { record: "global", field: "footer_left" });
+
+      const fixedNavFields: Record<string, string> = {
+        home: "nav_home_label",
+        acting: "nav_acting_label",
+        design: "nav_design_label",
+        resume: "nav_resume_label",
+        contact: "nav_contact_label",
+      };
+      const navItems = (truthData.site as unknown as { header_nav?: Array<{ page_key?: string }> }).header_nav || [];
+      document.querySelectorAll<HTMLElement>(".truth-nav a").forEach((anchor, index) => {
+        const pageKey = navItems[index]?.page_key || "";
+        const field = fixedNavFields[pageKey];
+        if (field) mark(anchor, { record: "global", field });
+      });
 
       document.querySelectorAll<HTMLElement>('.tile[data-product-id]').forEach((tile) => {
         const product = tile.dataset.productId || "";
