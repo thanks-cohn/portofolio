@@ -10,7 +10,7 @@
   },
   "scripts": {
     "install:ci": "bash scripts/install-ci.sh",
-    "truth:generate": "node scripts/generate-truth-release.mjs",
+    "truth:generate": "node scripts/generate-truth-site.mjs",
     "dev": "npm run truth:generate && NEXT_PUBLIC_NUME_TARGET=local WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
     "build": "npm run build:cloudflare",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
