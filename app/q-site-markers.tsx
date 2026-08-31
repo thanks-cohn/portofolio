@@ -26,16 +26,22 @@ function protectQFromFooter() {
   const footer = document.querySelector<HTMLElement>(".truth-footer");
   if (!orb || !footer) return;
 
-  // Measure the orb at its authored drag position, then apply only the minimum
-  // visual lift needed to keep it out of the footer. The drag coordinates stay
-  // untouched, so the existing Q behavior remains predictable.
-  orb.style.setProperty("--q-footer-shift", "0px");
+  // Treat the footer as a hard boundary without resetting the orb before every
+  // measurement. Resetting to zero first made the Q visibly twitch when this
+  // guard ran repeatedly. Derive its authored position from the current shift
+  // instead, then apply only the minimum lift required.
+  const currentShift = Number.parseFloat(orb.style.getPropertyValue("--q-footer-shift")) || 0;
   const orbRect = orb.getBoundingClientRect();
   const footerRect = footer.getBoundingClientRect();
   const gap = 14;
-  const overlap = orbRect.bottom + gap - footerRect.top;
+  const authoredBottom = orbRect.bottom - currentShift;
+  const overlap = authoredBottom + gap - footerRect.top;
   const footerIsVisible = footerRect.top < window.innerHeight && footerRect.bottom > 0;
-  orb.style.setProperty("--q-footer-shift", footerIsVisible && overlap > 0 ? `${-overlap}px` : "0px");
+  const nextShift = footerIsVisible && overlap > 0 ? -overlap : 0;
+
+  if (Math.abs(nextShift - currentShift) > 0.5) {
+    orb.style.setProperty("--q-footer-shift", `${nextShift}px`);
+  }
 }
 
 export function QSiteMarkers() {
@@ -79,7 +85,9 @@ export function QSiteMarkers() {
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      scheduleProtect();
+      const overOrb = event.target instanceof Element ? event.target.closest(".q-site-orb") : null;
+      if (overOrb) scheduleProtect();
+
       const active = longPress;
       if (!active || active.pointerId !== event.pointerId) return;
       if (Math.hypot(event.clientX - active.x, event.clientY - active.y) > 10) clearLongPress();
