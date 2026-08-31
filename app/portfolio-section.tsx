@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import truthData from "../data/truth.generated.json";
+import { resolveAssetPath } from "../lib/asset-path.mjs";
 
 type TextTag = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -21,6 +22,7 @@ type PageSection = {
   image_side: "left" | "right";
   image_url: string;
   image_alt: string;
+  image_link_url?: string;
   header: string;
   subheader: string;
   body: string;
@@ -48,6 +50,12 @@ type EditablePage = {
   style?: PageStyle;
   sections?: PageSection[];
 };
+
+function resolvedHref(value: string) {
+  if (!value) return "";
+  if (/^(?:https?:)?\/\//i.test(value) || /^(?:mailto|tel):/i.test(value)) return value;
+  return resolveAssetPath(value);
+}
 
 function googleFamily(url: string) {
   if (!url) return undefined;
@@ -193,7 +201,19 @@ export function PortfolioSection({ section }: { section: string }) {
           {sections.map((item: PageSection) => (
             <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
               <div className="portfolio-builder-image">
-                {item.image_url ? <img src={item.image_url} alt={item.image_alt || ""} /> : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
+                {item.image_link_url ? (
+                  <a
+                    className="portfolio-builder-image-link"
+                    href={resolvedHref(item.image_link_url)}
+                    aria-label={`Open ${item.header || "project"}`}
+                  >
+                    {item.image_url ? <img src={item.image_url} alt={item.image_alt || ""} /> : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
+                  </a>
+                ) : item.image_url ? (
+                  <img src={item.image_url} alt={item.image_alt || ""} />
+                ) : (
+                  <div className="portfolio-builder-image-placeholder">IMAGE</div>
+                )}
               </div>
               <div className="portfolio-builder-copy">
                 {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" /> : null}
