@@ -23,6 +23,7 @@
   cursor: grab;
   user-select: none;
   touch-action: none;
+  transform: translateY(var(--q-footer-shift, 0px));
   transition: opacity .45s ease, transform .2s ease, background .2s ease, color .2s ease;
 }
 
@@ -30,7 +31,7 @@
 .q-site-orb:hover,
 .q-site-orb:focus-visible {
   opacity: 1 !important;
-  transform: scale(1.04);
+  transform: translateY(var(--q-footer-shift, 0px)) scale(1.04);
   outline: none;
 }
 .q-site-orb.is-faded { opacity: .11; }
