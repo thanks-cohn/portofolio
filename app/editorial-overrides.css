@@ -77,6 +77,39 @@
   text-transform: none;
 }
 
+/* The original NUME rotunda carries storefront/demo copy that has no purpose in
+   the portfolio. Keep the project itself and remove the secondary labels. */
+.desktop-rotunda .work-copy > p,
+.desktop-rotunda .work-copy > span,
+.mobile-rotunda-meta p,
+.mobile-rotunda-meta > span,
+.hero-index,
+.mobile-hero-index,
+.hero-action,
+.mobile-hero-action,
+.site-preview .preview-bar,
+.mobile-site-preview .preview-bar,
+.preview-page > span,
+.preview-page .demo-checkout {
+  display: none !important;
+}
+
+/* With the redundant kicker/meta removed, let the project title sit cleanly. */
+.desktop-rotunda .work-copy h1,
+.mobile-rotunda-meta h1 {
+  margin-top: 0;
+}
+
+/* The legacy preview transition pushed Previous/Next outside the viewport.
+   Keep both controls visibly inside the expanded composition. */
+.is-previewing .hero-prev {
+  left: 8px !important;
+}
+
+.is-previewing .hero-next {
+  right: 8px !important;
+}
+
 .portfolio-builder-image-link {
   display: block;
   width: 100%;
