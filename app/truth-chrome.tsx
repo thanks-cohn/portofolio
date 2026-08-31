@@ -48,15 +48,21 @@ function resolvedHref(value: string) {
   return resolveAssetPath(value);
 }
 
+const socialSvgProps = {
+  width: 15,
+  height: 15,
+  style: { width: "15px", height: "15px", maxWidth: "15px", maxHeight: "15px", display: "block", flex: "0 0 15px" },
+} as const;
+
 function SocialIcon({ platform }: { platform: string }) {
   const key = platform.toLowerCase();
   if (key === "facebook") {
-    return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 8.2h2.6V4.4c-.45-.06-1.98-.2-3.8-.2-3.75 0-6.32 2.29-6.32 6.5v3.63H2.5v4.25h4.18V24h5.13v-5.42h4.28l.68-4.25h-4.96v-3.2c0-1.23.34-2.93 2.39-2.93Z" fill="currentColor"/></svg>;
+    return <svg {...socialSvgProps} viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 8.2h2.6V4.4c-.45-.06-1.98-.2-3.8-.2-3.75 0-6.32 2.29-6.32 6.5v3.63H2.5v4.25h4.18V24h5.13v-5.42h4.28l.68-4.25h-4.96v-3.2c0-1.23.34-2.93 2.39-2.93Z" fill="currentColor"/></svg>;
   }
   if (key === "instagram") {
-    return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="17.4" cy="6.7" r="1.1" fill="currentColor"/></svg>;
+    return <svg {...socialSvgProps} viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="17.4" cy="6.7" r="1.1" fill="currentColor"/></svg>;
   }
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 4.5 19.5 19.5M19.5 4.5 4.5 19.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
+  return <svg {...socialSvgProps} viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 4.5 19.5 19.5M19.5 4.5 4.5 19.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
 }
 
 function SocialLinks({ className }: { className: string }) {
