@@ -108,8 +108,6 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
     def save_r2_settings(self) -> None:
         self.r2_credentials_location.set(self.r2_credentials_location.get().strip() or "NULL")
         try:
-            # Validate now so a typo is caught where it is entered rather than
-            # only when Browse Images is pressed later.
             self._read_r2_credentials()
             self._save_config()
             self.status_text.set("R2 credential file saved")
@@ -125,10 +123,32 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
             raise R2Failure(f"R2 credential file was not found: {path}")
         return path
 
+    @staticmethod
+    def _normalize_cloudflare_copy(text: str) -> str:
+        """Normalize common browser/Cloudflare copy-paste artifacts.
+
+        Smart quotes and non-breaking spaces are converted before JSON parsing.
+        This makes copied snippets such as “portofolio/review/ ” usable without
+        asking the editor user to understand Unicode punctuation.
+        """
+        return (
+            text.replace("\ufeff", "")
+            .replace("\u00a0", " ")
+            .replace("\u2007", " ")
+            .replace("\u202f", " ")
+            .replace("“", '"')
+            .replace("”", '"')
+            .replace("„", '"')
+            .replace("‟", '"')
+            .replace("‘", "'")
+            .replace("’", "'")
+        )
+
     def _read_r2_credentials(self) -> dict[str, str]:
         path = self._credentials_path()
         try:
-            raw = json.loads(path.read_text(encoding="utf-8-sig"))
+            text = path.read_text(encoding="utf-8-sig")
+            raw = json.loads(self._normalize_cloudflare_copy(text))
         except json.JSONDecodeError as exc:
             raise R2Failure(
                 f"{path.name} must contain JSON with token, account_id, public_base_url, and optional location."
@@ -143,7 +163,7 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
             "token": str(raw.get("token") or "").strip(),
             "account_id": str(raw.get("account_id") or "").strip(),
             "public_base_url": str(raw.get("public_base_url") or "").strip(),
-            "location": str(raw.get("location") or "").strip(),
+            "location": str(raw.get("location") or "").strip().strip("/ "),
         }
         if not credentials["token"]:
             raise R2Failure("R2 credential file is missing \"token\".")
@@ -162,10 +182,10 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
         return self._read_r2_credentials()["account_id"]
 
     def _credential_default_location(self) -> str:
-        return self._read_r2_credentials().get("location", "").strip()
+        return self._read_r2_credentials().get("location", "").strip().strip("/ ")
 
     def _effective_r2_location(self, explicit: str) -> str:
-        override = explicit.strip()
+        override = explicit.strip().strip("/ ")
         if override:
             return override
         default = self._credential_default_location()
@@ -181,10 +201,6 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
         if configured:
             return configured.replace("{bucket}", bucket).rstrip("/")
 
-        # public_base_url is allowed to be blank. In that case try the bucket's
-        # enabled r2.dev domain. A narrowly-scoped token may not have permission
-        # to inspect this setting, so failure simply means selection needs a
-        # public_base_url added to the credential file.
         try:
             url = f"{self._r2_api_base(bucket)}/domains/managed"
             payload = self._cf_request(url, expect_json=True)
@@ -226,8 +242,6 @@ class CredentialMediaPortfolioBuilder(MediaPortfolioBuilder):
         entry = self.section_media_entries.get(row_index)
         if entry is None:
             return
-        # The inherited card already provides the field and Browse button; make
-        # its label explicit that blank means the credential-file default.
         card = entry.master
         for child in card.grid_slaves():
             if isinstance(child, ttk.Label) and child.cget("text") == "R2 bucket/location":
