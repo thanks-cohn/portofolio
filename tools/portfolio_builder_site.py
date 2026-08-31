@@ -2,7 +2,7 @@
 """Final site-facing CMS layer for Quandranea.
 
 Keeps the release builder stable while adding editable social links, seeded
-project detail sections, and literal hyphen-preserving public routes.
+editorial project sections, and literal hyphen-preserving public routes.
 """
 
 from __future__ import annotations
@@ -13,13 +13,11 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-from portfolio_builder import widget_get
 from portfolio_builder_release import ReleasePortfolioBuilder
 
 SOCIALS = (
     ("facebook", "Facebook"),
     ("instagram", "Instagram"),
-    ("twitter", "Twitter / X"),
 )
 
 
@@ -83,6 +81,16 @@ class SitePortfolioBuilder(ReleasePortfolioBuilder):
                 index = len(self.rows) - 1
             self.social_vars[platform].set(self.rows[index].get("destination_url", "") or "")
 
+        # Twitter/X was intentionally removed from the public site. Remove stale
+        # social rows if an older editor session created one before this change.
+        self.rows[:] = [
+            row for row in self.rows
+            if not (
+                row.get("record_type") == "social_link"
+                and (row.get("product_id") or "").strip().lower() in {"twitter", "x"}
+            )
+        ]
+
     def _append_seed_section(self, page_key: str, item: dict) -> None:
         row = self._new_csv_row()
         row.update(
@@ -111,17 +119,27 @@ class SitePortfolioBuilder(ReleasePortfolioBuilder):
         )
         self.rows.append(row)
 
-    def _ensure_hidden_project_sections(self) -> None:
-        for page in self._seed_data().get("hidden_pages", []):
+    def _has_sections(self, page_key: str) -> bool:
+        return any(
+            row.get("record_type") == "page_section"
+            and self._slug(row.get("product_id", "")) == page_key
+            for row in self.rows
+        )
+
+    def _ensure_seeded_editorial_sections(self) -> None:
+        seed = self._seed_data()
+        page_seeds: list[tuple[str, dict]] = []
+        if isinstance(seed.get("props"), dict):
+            page_seeds.append(("acting", seed["props"]))
+        if isinstance(seed.get("design"), dict):
+            page_seeds.append(("design", seed["design"]))
+        for page in seed.get("hidden_pages", []):
             page_key = self._slug(str(page.get("key") or ""))
-            if not page_key:
-                continue
-            existing = any(
-                row.get("record_type") == "page_section"
-                and self._slug(row.get("product_id", "")) == page_key
-                for row in self.rows
-            )
-            if existing:
+            if page_key:
+                page_seeds.append((page_key, page))
+
+        for page_key, page in page_seeds:
+            if self._has_sections(page_key):
                 continue
             for item in page.get("sections", []):
                 self._append_seed_section(page_key, item)
@@ -131,7 +149,7 @@ class SitePortfolioBuilder(ReleasePortfolioBuilder):
         if not self.fieldnames:
             return
         self._ensure_social_rows()
-        self._ensure_hidden_project_sections()
+        self._ensure_seeded_editorial_sections()
         self._ensure_page_rows()
         self._ensure_page_style_rows()
         self._rebuild_custom_page_tabs()
@@ -150,6 +168,14 @@ class SitePortfolioBuilder(ReleasePortfolioBuilder):
                 index = len(self.rows) - 1
             self.rows[index]["title"] = label
             self.rows[index]["destination_url"] = self.social_vars[platform].get().strip()
+
+        self.rows[:] = [
+            row for row in self.rows
+            if not (
+                row.get("record_type") == "social_link"
+                and (row.get("product_id") or "").strip().lower() in {"twitter", "x"}
+            )
+        ]
 
     def _commit_all(self) -> None:
         super()._commit_all()
