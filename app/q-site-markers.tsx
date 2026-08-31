@@ -41,12 +41,52 @@ function protectQFromFooter() {
 export function QSiteMarkers() {
   useEffect(() => {
     let protectFrame = 0;
+    let longPressTimer: number | null = null;
+    let longPress: { pointerId: number; x: number; y: number; orb: HTMLElement } | null = null;
+
+    const clearLongPress = () => {
+      if (longPressTimer !== null) window.clearTimeout(longPressTimer);
+      longPressTimer = null;
+      longPress = null;
+    };
+
     const scheduleProtect = () => {
       if (protectFrame) return;
       protectFrame = window.requestAnimationFrame(() => {
         protectFrame = 0;
         protectQFromFooter();
       });
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+      const target = event.target instanceof Element ? event.target.closest<HTMLElement>(".q-site-orb") : null;
+      if (!target) return;
+      clearLongPress();
+      longPress = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, orb: target };
+      longPressTimer = window.setTimeout(() => {
+        const active = longPress;
+        if (!active || active.pointerId !== event.pointerId) return;
+        active.orb.dispatchEvent(new MouseEvent("contextmenu", {
+          bubbles: true,
+          cancelable: true,
+          clientX: active.x,
+          clientY: active.y,
+          button: 2,
+        }));
+        clearLongPress();
+      }, 650);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      scheduleProtect();
+      const active = longPress;
+      if (!active || active.pointerId !== event.pointerId) return;
+      if (Math.hypot(event.clientX - active.x, event.clientY - active.y) > 10) clearLongPress();
+    };
+
+    const onPointerEnd = (event: PointerEvent) => {
+      if (longPress?.pointerId === event.pointerId) clearLongPress();
     };
 
     const apply = () => {
@@ -122,13 +162,20 @@ export function QSiteMarkers() {
     });
     window.addEventListener("scroll", scheduleProtect, { passive: true });
     window.addEventListener("resize", scheduleProtect, { passive: true });
-    window.addEventListener("pointermove", scheduleProtect, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerup", onPointerEnd, { passive: true });
+    window.addEventListener("pointercancel", onPointerEnd, { passive: true });
     return () => {
       observer.disconnect();
+      clearLongPress();
       if (protectFrame) window.cancelAnimationFrame(protectFrame);
       window.removeEventListener("scroll", scheduleProtect);
       window.removeEventListener("resize", scheduleProtect);
-      window.removeEventListener("pointermove", scheduleProtect);
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerEnd);
+      window.removeEventListener("pointercancel", onPointerEnd);
     };
   }, []);
 
