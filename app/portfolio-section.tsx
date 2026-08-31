@@ -3,6 +3,19 @@ import truthData from "../data/truth.generated.json";
 type SectionKey = "ACTING" | "DESIGN" | "CONTACT";
 type TextTag = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
+type TextStyle = {
+  tag?: TextTag;
+  color?: string;
+  size?: number | null;
+  font_url?: string;
+};
+
+type PageStyle = {
+  title?: TextStyle;
+  kicker?: TextStyle;
+  body?: TextStyle;
+};
+
 type PageSection = {
   order: number;
   image_side: "left" | "right";
@@ -20,6 +33,9 @@ type PageSection = {
   header_font_url: string;
   subheader_font_url: string;
   body_font_url: string;
+  header_size?: number | null;
+  subheader_size?: number | null;
+  body_size?: number | null;
 };
 
 type EditablePage = {
@@ -27,6 +43,7 @@ type EditablePage = {
   kicker: string;
   body: string;
   email?: string;
+  style?: PageStyle;
   sections?: PageSection[];
 };
 
@@ -42,9 +59,27 @@ function googleFamily(url: string) {
   }
 }
 
-function TextElement({ tag, text, color, fontUrl, className }: { tag: TextTag; text: string; color?: string; fontUrl?: string; className: string }) {
+function TextElement({
+  tag,
+  text,
+  color,
+  fontUrl,
+  size,
+  className,
+}: {
+  tag: TextTag;
+  text: string;
+  color?: string;
+  fontUrl?: string;
+  size?: number | null;
+  className: string;
+}) {
   const family = googleFamily(fontUrl || "");
-  const style = { color: color || undefined, fontFamily: family ? `'${family}', sans-serif` : undefined };
+  const style = {
+    color: color || undefined,
+    fontFamily: family ? `'${family}', sans-serif` : undefined,
+    fontSize: size ? `${size}px` : undefined,
+  };
   switch (tag) {
     case "h1": return <h1 className={className} style={style}>{text}</h1>;
     case "h2": return <h2 className={className} style={style}>{text}</h2>;
@@ -60,20 +95,49 @@ export function PortfolioSection({ section }: { section: SectionKey }) {
   const key = section.toLowerCase() as "acting" | "design" | "contact";
   const page = truthData.pages[key] as unknown as EditablePage;
   const sections: PageSection[] = page.sections ?? [];
+  const pageStyle = page.style ?? {};
+  const titleStyle = pageStyle.title ?? {};
+  const kickerStyle = pageStyle.kicker ?? {};
+  const bodyStyle = pageStyle.body ?? {};
+
   const fontUrls: string[] = [...new Set(
-    sections
-      .flatMap((item: PageSection) => [item.header_font_url, item.subheader_font_url, item.body_font_url])
-      .filter((href): href is string => Boolean(href)),
+    [
+      titleStyle.font_url,
+      kickerStyle.font_url,
+      bodyStyle.font_url,
+      ...sections.flatMap((item: PageSection) => [item.header_font_url, item.subheader_font_url, item.body_font_url]),
+    ].filter((href): href is string => Boolean(href)),
   )];
 
   return (
     <main className={`portfolio-section portfolio-section-${key}`}>
       {fontUrls.map((href) => <link key={href} rel="stylesheet" href={href} />)}
       <div className="portfolio-section-copy">
-        <p>{page.kicker}</p>
-        <h1>{page.title}</h1>
+        <TextElement
+          tag={kickerStyle.tag || "p"}
+          text={page.kicker}
+          color={kickerStyle.color}
+          fontUrl={kickerStyle.font_url}
+          size={kickerStyle.size}
+          className="portfolio-section-kicker"
+        />
+        <TextElement
+          tag={titleStyle.tag || "h1"}
+          text={page.title}
+          color={titleStyle.color}
+          fontUrl={titleStyle.font_url}
+          size={titleStyle.size}
+          className="portfolio-section-title"
+        />
         <div className="portfolio-section-rule" aria-hidden="true" />
-        <p className="portfolio-section-body">{page.body}</p>
+        <TextElement
+          tag={bodyStyle.tag || "p"}
+          text={page.body}
+          color={bodyStyle.color}
+          fontUrl={bodyStyle.font_url}
+          size={bodyStyle.size}
+          className="portfolio-section-body"
+        />
         {page.email ? (
           <a className="portfolio-section-link" href={`mailto:${page.email}`}>{page.email}</a>
         ) : null}
@@ -87,9 +151,9 @@ export function PortfolioSection({ section }: { section: SectionKey }) {
                 {item.image_url ? <img src={item.image_url} alt={item.image_alt || ""} /> : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
               </div>
               <div className="portfolio-builder-copy">
-                {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} className="portfolio-builder-header" /> : null}
-                {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} className="portfolio-builder-subheader" /> : null}
-                {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} className="portfolio-builder-body" /> : null}
+                {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" /> : null}
+                {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" /> : null}
+                {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} size={item.body_size} className="portfolio-builder-body" /> : null}
               </div>
             </section>
           ))}
