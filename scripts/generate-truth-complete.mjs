@@ -37,7 +37,7 @@ function parseCsv(text) {
 
 const rows = parseCsv(csvText);
 const cleanKey = (value) => (value || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
-const routeSlug = (value) => (value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "page";
+const routeSlug = (value) => (value || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "_").replace(/^[_-]+|[_-]+$/g, "") || "page";
 function normalizeRoute(value, fallback = "page") {
   let text = (value || "").trim();
   if (/^https?:\/\//i.test(text)) {
@@ -119,7 +119,7 @@ truth.pages ||= {};
 truth.site ||= {};
 truth.site.font_rules ||= [];
 
-const headingFont = normalizeFontInput(seed.landing?.row_heading_font || "");
+const headingFont = fontInputs.site.row_heading || normalizeFontInput(seed.landing?.row_heading_font || "");
 if (headingFont) {
   let rule = truth.site.font_rules.find((item) => item.scope === "row_heading" && !item.product_id);
   if (!rule) {
@@ -266,6 +266,6 @@ for (const item of descriptors) {
   for (const alias of item.aliases) await generateRoute(alias, item.pageKey);
 }
 
-truth.schema_version = "1.9.0";
+truth.schema_version = "1.9.1";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
 console.log(`Applied ${descriptors.length} editable page route(s), PROPS defaults, hidden project pages, and per-text Google Fonts.`);
