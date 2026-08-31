@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
 import truthData from "../data/truth.generated.json";
 import { resolveAssetPath } from "../lib/asset-path.mjs";
 
@@ -50,6 +50,27 @@ type EditablePage = {
   style?: PageStyle;
   sections?: PageSection[];
 };
+
+type QMeta = {
+  record: "page_text" | "page_section";
+  product: string;
+  field: string;
+  order?: number;
+  kind?: "text" | "image";
+  value?: string;
+};
+
+function qAttrs(meta?: QMeta): HTMLAttributes<HTMLElement> & Record<string, string | number | undefined> {
+  if (!meta) return {};
+  return {
+    "data-q-edit": meta.kind || "text",
+    "data-q-record": meta.record,
+    "data-q-product": meta.product,
+    "data-q-field": meta.field,
+    "data-q-order": meta.order === undefined ? undefined : String(meta.order),
+    "data-q-value": meta.value,
+  };
+}
 
 function resolvedHref(value: string) {
   if (!value) return "";
@@ -114,6 +135,7 @@ function TextElement({
   fontUrl,
   size,
   className,
+  q,
 }: {
   tag: TextTag;
   text: string;
@@ -121,6 +143,7 @@ function TextElement({
   fontUrl?: string;
   size?: number | null;
   className: string;
+  q?: QMeta;
 }) {
   const family = googleFamily(fontUrl || "");
   const defaults = visualDefaults(className);
@@ -130,14 +153,15 @@ function TextElement({
     fontFamily: family ? `'${family}', sans-serif` : defaults.fontFamily,
     fontSize: size ? `${size}px` : defaults.fontSize,
   };
+  const attrs = qAttrs(q);
   switch (tag) {
-    case "h1": return <h1 className={className} style={style}>{text}</h1>;
-    case "h2": return <h2 className={className} style={style}>{text}</h2>;
-    case "h3": return <h3 className={className} style={style}>{text}</h3>;
-    case "h4": return <h4 className={className} style={style}>{text}</h4>;
-    case "h5": return <h5 className={className} style={style}>{text}</h5>;
-    case "h6": return <h6 className={className} style={style}>{text}</h6>;
-    default: return <p className={className} style={style}>{text}</p>;
+    case "h1": return <h1 className={className} style={style} {...attrs}>{text}</h1>;
+    case "h2": return <h2 className={className} style={style} {...attrs}>{text}</h2>;
+    case "h3": return <h3 className={className} style={style} {...attrs}>{text}</h3>;
+    case "h4": return <h4 className={className} style={style} {...attrs}>{text}</h4>;
+    case "h5": return <h5 className={className} style={style} {...attrs}>{text}</h5>;
+    case "h6": return <h6 className={className} style={style} {...attrs}>{text}</h6>;
+    default: return <p className={className} style={style} {...attrs}>{text}</p>;
   }
 }
 
@@ -173,6 +197,7 @@ export function PortfolioSection({ section }: { section: string }) {
           fontUrl={kickerStyle.font_url}
           size={kickerStyle.size}
           className="portfolio-section-kicker"
+          q={{ record: "page_text", product: key, field: "kicker" }}
         />
         <TextElement
           tag={titleStyle.tag || "h1"}
@@ -181,6 +206,7 @@ export function PortfolioSection({ section }: { section: string }) {
           fontUrl={titleStyle.font_url}
           size={titleStyle.size}
           className="portfolio-section-title"
+          q={{ record: "page_text", product: key, field: "title" }}
         />
         <div className="portfolio-section-rule" aria-hidden="true" />
         <TextElement
@@ -190,9 +216,16 @@ export function PortfolioSection({ section }: { section: string }) {
           fontUrl={bodyStyle.font_url}
           size={bodyStyle.size}
           className="portfolio-section-body"
+          q={{ record: "page_text", product: key, field: "body" }}
         />
         {page.email ? (
-          <a className="portfolio-section-link" href={`mailto:${page.email}`}>{page.email}</a>
+          <a
+            className="portfolio-section-link"
+            href={`mailto:${page.email}`}
+            {...qAttrs({ record: "page_text", product: key, field: "email" })}
+          >
+            {page.email}
+          </a>
         ) : null}
       </div>
 
@@ -207,18 +240,28 @@ export function PortfolioSection({ section }: { section: string }) {
                     href={resolvedHref(item.image_link_url)}
                     aria-label={`Open ${item.header || "project"}`}
                   >
-                    {item.image_url ? <img src={item.image_url} alt={item.image_alt || ""} /> : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.image_alt || ""}
+                        {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
+                      />
+                    ) : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
                   </a>
                 ) : item.image_url ? (
-                  <img src={item.image_url} alt={item.image_alt || ""} />
+                  <img
+                    src={item.image_url}
+                    alt={item.image_alt || ""}
+                    {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
+                  />
                 ) : (
                   <div className="portfolio-builder-image-placeholder">IMAGE</div>
                 )}
               </div>
               <div className="portfolio-builder-copy">
-                {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" /> : null}
-                {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" /> : null}
-                {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} size={item.body_size} className="portfolio-builder-body" /> : null}
+                {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" q={{ record: "page_section", product: key, order: item.order, field: "title" }} /> : null}
+                {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" q={{ record: "page_section", product: key, order: item.order, field: "destination_label" }} /> : null}
+                {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} size={item.body_size} className="portfolio-builder-body" q={{ record: "page_section", product: key, order: item.order, field: "description" }} /> : null}
               </div>
             </section>
           ))}
