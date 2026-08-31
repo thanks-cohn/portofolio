@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import truthData from "../data/truth.generated.json";
 
 type SectionKey = "ACTING" | "DESIGN" | "CONTACT";
@@ -59,7 +60,7 @@ function googleFamily(url: string) {
   }
 }
 
-function visualDefaults(className: string) {
+function visualDefaults(className: string): CSSProperties {
   if (className === "portfolio-section-title") {
     return {
       margin: 0,
@@ -68,7 +69,7 @@ function visualDefaults(className: string) {
       fontWeight: 400,
       lineHeight: 0.95,
       letterSpacing: "-.025em",
-      textAlign: "center" as const,
+      textAlign: "center",
     };
   }
   if (className === "portfolio-section-kicker") {
@@ -79,8 +80,8 @@ function visualDefaults(className: string) {
       fontWeight: 400,
       lineHeight: 1.4,
       letterSpacing: ".2em",
-      textTransform: "uppercase" as const,
-      textAlign: "center" as const,
+      textTransform: "uppercase",
+      textAlign: "center",
     };
   }
   if (className === "portfolio-section-body") {
@@ -91,7 +92,7 @@ function visualDefaults(className: string) {
       fontSize: "14px",
       fontWeight: 400,
       lineHeight: 1.75,
-      textAlign: "center" as const,
+      textAlign: "center",
     };
   }
   return {};
@@ -113,11 +114,12 @@ function TextElement({
   className: string;
 }) {
   const family = googleFamily(fontUrl || "");
-  const style = {
-    ...visualDefaults(className),
+  const defaults = visualDefaults(className);
+  const style: CSSProperties = {
+    ...defaults,
     color: color || undefined,
-    fontFamily: family ? `'${family}', sans-serif` : visualDefaults(className).fontFamily,
-    fontSize: size ? `${size}px` : visualDefaults(className).fontSize,
+    fontFamily: family ? `'${family}', sans-serif` : defaults.fontFamily,
+    fontSize: size ? `${size}px` : defaults.fontSize,
   };
   switch (tag) {
     case "h1": return <h1 className={className} style={style}>{text}</h1>;
