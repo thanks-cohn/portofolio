@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate portfolio builder Python
-        run: python -m py_compile tools/portfolio_builder_site.py tools/truth_csv_editor.py
+        run: python -m py_compile tools/portfolio_builder_site.py tools/portfolio_builder_q.py tools/truth_csv_editor.py
       - uses: actions/setup-node@v4
         with: { node-version: "22", cache: npm }
       - uses: actions/configure-pages@v5
