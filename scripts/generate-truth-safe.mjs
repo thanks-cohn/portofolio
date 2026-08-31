@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -190,6 +190,19 @@ for (const block of truth.blocks || []) {
 
 truth.schema_version = "1.6.0";
 await write(truthPath, truth);
+
+// Generate literal static page routes. Because the site uses output: export on
+// GitHub Pages, concrete folders are simpler and more reliable than a dynamic
+// [slug] route. The same /pages/<slug>/ path works on Cloudflare Pages.
+const generatedPagesRoot = path.join(root, "app", "pages");
+await rm(generatedPagesRoot, { recursive: true, force: true });
+await mkdir(generatedPagesRoot, { recursive: true });
+for (const pageKey of [...customKeys].sort()) {
+  const pageDirectory = path.join(generatedPagesRoot, pageKey);
+  await mkdir(pageDirectory, { recursive: true });
+  const source = `import { PortfolioSection } from "../../portfolio-section";\n\nexport default function GeneratedContentPage() {\n  return <PortfolioSection section=${JSON.stringify(pageKey)} />;\n}\n`;
+  await writeFile(path.join(pageDirectory, "page.tsx"), source, "utf8");
+}
 
 // Put all unrelated original catalog families back exactly as they were.
 for (const catalogPath of catalogPaths) {
