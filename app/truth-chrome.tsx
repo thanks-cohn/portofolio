@@ -19,6 +19,14 @@ type ColorRule = {
   color: string;
 };
 
+type TopicBlock = {
+  product_id: string;
+  destination_label?: string;
+  destination_url?: string;
+  section?: string;
+  location?: string;
+};
+
 const siteStyles = truthData.site as unknown as { font_rules?: FontRule[]; color_rules?: ColorRule[] };
 const fontRules = siteStyles.font_rules ?? [];
 const colorRules = siteStyles.color_rules ?? [];
@@ -43,6 +51,11 @@ function setText(selector: string, value: string) {
 
 function cssEscape(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function blockMeta(block: TopicBlock | null) {
+  if (!block) return "";
+  return [block.section?.trim(), block.location?.trim()].filter(Boolean).join(" · ");
 }
 
 function textSelectors(scope: string, productId = "") {
@@ -133,11 +146,24 @@ export function TruthChrome() {
     const applyTruthCopy = () => {
       const main = document.querySelector<HTMLElement>(".nume");
       const previewing = main?.classList.contains("is-previewing") ?? false;
-      const block = selectedBlock();
+      const block = selectedBlock() as unknown as TopicBlock | null;
       if (main) {
         if (block?.product_id) main.dataset.truthProductId = block.product_id;
         else delete main.dataset.truthProductId;
       }
+
+      // The Quandranea row is content, not commerce. Replace NUME's inherited
+      // price/status text with optional generic section/location metadata.
+      for (const rawBlock of truthData.blocks) {
+        const topic = rawBlock as unknown as TopicBlock;
+        const value = blockMeta(topic);
+        const selector = `.tile[data-product-id="${cssEscape(topic.product_id)}"] .tile-meta em`;
+        document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
+          if (node.textContent !== value) node.textContent = value;
+        });
+      }
+      setText(".work-copy > span, .mobile-rotunda-meta > span", blockMeta(block));
+
       setText(".hero-action, .mobile-hero-action", `${previewing ? (block?.destination_label || truthData.site.visit_label) : truthData.site.details_label} ↗`);
       setText(".preview-bar span", truthData.site.preview_header);
       const indexText = document.querySelector<HTMLElement>(".hero-index, .mobile-hero-index")?.textContent?.trim() || "";
@@ -167,7 +193,7 @@ export function TruthChrome() {
       if (!target?.closest(".hero, .mobile-hero")) return;
       const main = document.querySelector<HTMLElement>(".nume");
       if (!main?.classList.contains("is-previewing")) return;
-      const block = selectedBlock();
+      const block = selectedBlock() as unknown as TopicBlock | null;
       if (!block?.destination_url) return;
       event.preventDefault();
       event.stopPropagation();
