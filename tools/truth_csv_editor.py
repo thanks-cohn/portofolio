@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compatibility entrypoint for the Quandranea visual portfolio builder."""
 
-from portfolio_builder_visual_final import main
+from portfolio_builder_visual_contained import main
 
 
 if __name__ == "__main__":
