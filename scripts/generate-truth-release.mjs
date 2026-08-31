@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,6 +36,31 @@ const csvRows = parseCsv(await readFile(path.join(root, "truth.csv"), "utf8"));
 const seed = JSON.parse(await readFile(path.join(root, "data", "portfolio-seed.json"), "utf8"));
 const first = csvRows.find((row) => !row.record_type || row.record_type === "block") || {};
 
+function seededSection(item) {
+  return {
+    order: Number(item.order) || 1,
+    image_side: item.image_side === "right" ? "right" : "left",
+    image_url: item.image_url || "",
+    image_alt: item.image_alt || "Project image",
+    image_link_url: item.image_link_url || "",
+    header: item.header || "",
+    subheader: item.subheader || "",
+    body: item.body || "",
+    header_tag: item.header_tag || "h1",
+    subheader_tag: item.subheader_tag || "h3",
+    body_tag: item.body_tag || "p",
+    header_color: item.header_color || "#f1eee7",
+    subheader_color: item.subheader_color || "#b4b2ad",
+    body_color: item.body_color || "#b4b2ad",
+    header_font_url: item.header_font_url || "https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap",
+    subheader_font_url: item.subheader_font_url || "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap",
+    body_font_url: item.body_font_url || "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap",
+    header_size: Number(item.header_size) || 52,
+    subheader_size: Number(item.subheader_size) || 17,
+    body_size: Number(item.body_size) || 16,
+  };
+}
+
 // Each editorial image/text section may lead to a deeper page. That destination
 // can be a page hidden from the top navigation; routing and menu visibility are
 // deliberately independent concepts.
@@ -46,6 +71,31 @@ for (const row of csvRows.filter((item) => item.record_type === "page_section"))
   const section = truth.pages?.[pageKey]?.sections?.find((item) => item.order === order);
   if (!section) continue;
   section.image_link_url = (row.section_link_url || "").trim();
+}
+
+// The two initial hidden project pages get full editorial layouts. Real CSV
+// page_section rows always win once the user edits those pages in the CMS.
+for (const item of seed.hidden_pages || []) {
+  const key = cleanKey(item.key);
+  const page = truth.pages?.[key];
+  if (!key || !page) continue;
+  const csvSections = csvRows.filter((row) => row.record_type === "page_section" && cleanKey(row.product_id) === key);
+  if (!csvSections.length && Array.isArray(item.sections)) page.sections = item.sections.map(seededSection);
+}
+
+// The requested public links keep their literal hyphens. The older route layer
+// normalizes them to underscores, so generate explicit static aliases here.
+for (const [routeName, pageKey] of [["project-a", "project-a"], ["project-b", "project-b"]]) {
+  if (!truth.pages?.[pageKey]) continue;
+  const dir = path.join(root, "app", routeName);
+  await mkdir(dir, { recursive: true });
+  const importPath = path.relative(dir, path.join(root, "app", "portfolio-section")).replaceAll(path.sep, "/");
+  const rel = importPath.startsWith(".") ? importPath : `./${importPath}`;
+  await writeFile(
+    path.join(dir, "page.tsx"),
+    `import { PortfolioSection } from ${JSON.stringify(rel)};\n\nexport default function ProjectPage() {\n  return <PortfolioSection section=${JSON.stringify(pageKey)} />;\n}\n`,
+    "utf8",
+  );
 }
 
 // Social profile URLs come from truth.csv. Seed values are only placeholders
@@ -117,6 +167,6 @@ for (const item of truth.site?.header_nav || []) {
   item.label = String(item.label || "").toUpperCase();
 }
 
-truth.schema_version = "1.11.0";
+truth.schema_version = "1.12.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Applied click-through destinations, social links, page-copy punctuation, uppercase navigation, and landing-font override support.");
+console.log("Applied full project layouts, click-through destinations, social links, uppercase navigation, and landing-font support.");
