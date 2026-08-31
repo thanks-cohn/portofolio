@@ -78,6 +78,17 @@ function resolvedHref(value: string) {
   return resolveAssetPath(value);
 }
 
+// These four overview rows are structural portfolio navigation. Their click
+// destinations must survive image swaps, old CSV rows, or missing optional link
+// metadata. An explicit image_link_url may still override these defaults.
+function permanentProjectHref(pageKey: string, order: number) {
+  const routes: Record<string, Record<number, string>> = {
+    acting: { 1: "/project-a/", 2: "/project-b/" },
+    design: { 1: "/project-c/", 2: "/project-d/" },
+  };
+  return routes[pageKey]?.[order] || "";
+}
+
 function googleFamily(url: string) {
   if (!url) return undefined;
   try {
@@ -231,40 +242,43 @@ export function PortfolioSection({ section }: { section: string }) {
 
       {sections.length ? (
         <div className="portfolio-builder-sections" aria-label={`${page.title} content`}>
-          {sections.map((item: PageSection) => (
-            <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
-              <div className="portfolio-builder-image">
-                {item.image_link_url ? (
-                  <a
-                    className="portfolio-builder-image-link"
-                    href={resolvedHref(item.image_link_url)}
-                    aria-label={`Open ${item.header || "project"}`}
-                  >
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.image_alt || ""}
-                        {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
-                      />
-                    ) : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
-                  </a>
-                ) : item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.image_alt || ""}
-                    {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
-                  />
-                ) : (
-                  <div className="portfolio-builder-image-placeholder">IMAGE</div>
-                )}
-              </div>
-              <div className="portfolio-builder-copy">
-                {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" q={{ record: "page_section", product: key, order: item.order, field: "title" }} /> : null}
-                {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" q={{ record: "page_section", product: key, order: item.order, field: "destination_label" }} /> : null}
-                {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} size={item.body_size} className="portfolio-builder-body" q={{ record: "page_section", product: key, order: item.order, field: "description" }} /> : null}
-              </div>
-            </section>
-          ))}
+          {sections.map((item: PageSection) => {
+            const imageHref = String(item.image_link_url || "").trim() || permanentProjectHref(key, item.order);
+            return (
+              <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
+                <div className="portfolio-builder-image">
+                  {imageHref ? (
+                    <a
+                      className="portfolio-builder-image-link"
+                      href={resolvedHref(imageHref)}
+                      aria-label={`Open ${item.header || "project"}`}
+                    >
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.image_alt || ""}
+                          {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
+                        />
+                      ) : <div className="portfolio-builder-image-placeholder">IMAGE</div>}
+                    </a>
+                  ) : item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.image_alt || ""}
+                      {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
+                    />
+                  ) : (
+                    <div className="portfolio-builder-image-placeholder">IMAGE</div>
+                  )}
+                </div>
+                <div className="portfolio-builder-copy">
+                  {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" q={{ record: "page_section", product: key, order: item.order, field: "title" }} /> : null}
+                  {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" q={{ record: "page_section", product: key, order: item.order, field: "destination_label" }} /> : null}
+                  {item.body ? <TextElement tag={item.body_tag || "p"} text={item.body} color={item.body_color} fontUrl={item.body_font_url} size={item.body_size} className="portfolio-builder-body" q={{ record: "page_section", product: key, order: item.order, field: "description" }} /> : null}
+                </div>
+              </section>
+            );
+          })}
         </div>
       ) : null}
     </main>
