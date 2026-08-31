@@ -11,6 +11,7 @@ await import("./generate-truth-safe.mjs");
 const truthPath = path.join(root, "data", "truth.generated.json");
 const truth = JSON.parse(await readFile(truthPath, "utf8"));
 const csvText = await readFile(path.join(root, "truth.csv"), "utf8");
+const seed = JSON.parse(await readFile(path.join(root, "data", "portfolio-seed.json"), "utf8"));
 
 function parseCsv(text) {
   const rows = [];
@@ -112,6 +113,68 @@ for (const row of rows.filter((item) => item.record_type === "page_section")) {
   section.body_font_url = normalizeFontInput(row.footer_icon_url)?.href || section.body_font_url || "";
 }
 
+// Seed the requested editorial structure without taking control away from truth.csv.
+// Once the desktop editor saves real rows for these sections/pages, those rows win.
+truth.pages ||= {};
+truth.site ||= {};
+truth.site.font_rules ||= [];
+
+const headingFont = normalizeFontInput(seed.landing?.row_heading_font || "");
+if (headingFont) {
+  let rule = truth.site.font_rules.find((item) => item.scope === "row_heading" && !item.product_id);
+  if (!rule) {
+    rule = { scope: "row_heading", family: headingFont.family, weight: "500", style: "normal", fallback: "Georgia, serif" };
+    truth.site.font_rules.push(rule);
+  } else {
+    rule.family = headingFont.family;
+    rule.weight = "500";
+    rule.style = "normal";
+    rule.fallback = "Georgia, serif";
+  }
+}
+
+if (truth.pages.acting && seed.props) {
+  truth.pages.acting.title = seed.props.title;
+  truth.pages.acting.kicker = seed.props.kicker;
+  truth.pages.acting.body = seed.props.body;
+  if (!Array.isArray(truth.pages.acting.sections) || truth.pages.acting.sections.length === 0) {
+    truth.pages.acting.sections = seed.props.sections.map((item) => ({
+      ...item,
+      header_size: Number(item.header_size) || null,
+      subheader_size: Number(item.subheader_size) || null,
+      body_size: Number(item.body_size) || null,
+    }));
+  }
+}
+
+if (truth.pages.contact && seed.contact_email) truth.pages.contact.email = seed.contact_email;
+
+for (const item of seed.hidden_pages || []) {
+  const key = cleanKey(item.key);
+  if (!key || truth.pages[key]) continue;
+  truth.pages[key] = {
+    title: item.title,
+    kicker: item.kicker,
+    body: item.body,
+    path: item.path,
+    custom: true,
+    style: {
+      title: { tag: "h1", color: "", size: null, font_url: "" },
+      kicker: { tag: "p", color: "", size: null, font_url: "" },
+      body: { tag: "p", color: "", size: null, font_url: "" },
+    },
+    sections: [],
+  };
+}
+
+// Correct obvious visible spelling issues while leaving the underlying project data intact.
+for (const block of truth.blocks || []) {
+  if (block.title === "Shakespears Twelfth Night" || block.title === "Shakespeare Twelfth Night") block.title = "Shakespeare's Twelfth Night";
+  if (block.title === "Prop Artist ( The servant of Two masters)") block.title = "Prop Artist (The Servant of Two Masters)";
+  if (block.description === "Carpentinng for Big love.") block.description = "Carpentry for Big Love.";
+  if (block.description === "spring 2026") block.description = "Spring 2026";
+}
+
 const fixedPages = ["acting", "design", "resume", "contact"];
 const fixedDefaults = Object.fromEntries(fixedPages.map((key) => [key, `/${key}/`]));
 const routeRows = new Map();
@@ -141,16 +204,15 @@ for (const [pageKey, page] of Object.entries(truth.pages || {})) {
   descriptors.push({ pageKey, canonical, aliases: routeAliases, show, label, order, fixed: isFixed });
 }
 
-// Build the top menu from the simple controls. HOME stays first and page items
-// can be reordered freely relative to one another.
+// Build the top menu from the simple controls. HOME stays first and all visible
+// titles are rendered in uppercase while preserving the actual words.
 const firstBlock = rows.find((row) => !row.record_type || row.record_type === "block") || {};
-const homeLabel = (firstBlock.nav_home_label || "HOME").trim();
-const homeUrl = normalizeRoute(firstBlock.nav_home_url || "/", "");
+const homeLabel = (firstBlock.nav_home_label || "HOME").trim().toUpperCase();
 const pageNav = descriptors
   .filter((item) => item.show)
   .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label))
   .map((item) => ({
-    label: item.label,
+    label: item.label.toUpperCase(),
     url: item.canonical,
     page_key: item.pageKey,
     font: fontInputs.pages[item.pageKey]?.nav_label || null,
@@ -204,6 +266,6 @@ for (const item of descriptors) {
   for (const alias of item.aliases) await generateRoute(alias, item.pageKey);
 }
 
-truth.schema_version = "1.7.0";
+truth.schema_version = "1.9.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log(`Applied ${descriptors.length} editable page route(s), top-menu controls, aliases, and per-text Google Fonts.`);
+console.log(`Applied ${descriptors.length} editable page route(s), PROPS defaults, hidden project pages, and per-text Google Fonts.`);
