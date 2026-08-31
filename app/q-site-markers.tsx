@@ -21,6 +21,23 @@ function mark(
   if (options.value !== undefined) node.dataset.qValue = options.value;
 }
 
+function protectQFromFooter() {
+  const orb = document.querySelector<HTMLElement>(".q-site-orb");
+  const footer = document.querySelector<HTMLElement>(".truth-footer");
+  if (!orb || !footer) return;
+
+  // Measure the orb at its authored drag position, then apply only the minimum
+  // visual lift needed to keep it out of the footer. The drag coordinates stay
+  // untouched, so the existing Q behavior remains predictable.
+  orb.style.setProperty("--q-footer-shift", "0px");
+  const orbRect = orb.getBoundingClientRect();
+  const footerRect = footer.getBoundingClientRect();
+  const gap = 14;
+  const overlap = orbRect.bottom + gap - footerRect.top;
+  const footerIsVisible = footerRect.top < window.innerHeight && footerRect.bottom > 0;
+  orb.style.setProperty("--q-footer-shift", footerIsVisible && overlap > 0 ? `${-overlap}px` : "0px");
+}
+
 export function QSiteMarkers() {
   useEffect(() => {
     const apply = () => {
@@ -82,6 +99,8 @@ export function QSiteMarkers() {
           });
         }
       }
+
+      protectQFromFooter();
     };
 
     apply();
@@ -92,7 +111,13 @@ export function QSiteMarkers() {
       attributes: true,
       attributeFilter: ["class", "data-truth-product-id"],
     });
-    return () => observer.disconnect();
+    window.addEventListener("scroll", protectQFromFooter, { passive: true });
+    window.addEventListener("resize", protectQFromFooter, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", protectQFromFooter);
+      window.removeEventListener("resize", protectQFromFooter);
+    };
   }, []);
 
   return null;
