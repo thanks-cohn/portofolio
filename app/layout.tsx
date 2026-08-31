@@ -3,6 +3,7 @@ import truthData from "../data/truth.generated.json";
 import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
+import { QSiteMarkers } from "./q-site-markers";
 import "./globals.css";
 import "./middle-row-only.css";
 import "./editorial-overrides.css";
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body>
         {children}
         <TruthChrome />
+        <QSiteMarkers />
         <QSiteEditor />
       </body>
     </html>
