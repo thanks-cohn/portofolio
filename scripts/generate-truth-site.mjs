@@ -30,13 +30,23 @@ function mergeSeedSections(page, seedSections) {
       .map((item) => [Number(item.order), item]),
   );
 
-  // A CSV-edited row always wins. Seed data only fills orders that are absent.
-  // This is important for the floating-Q editor: changing one image/text field
-  // must never make the untouched sibling rows disappear after redeployment.
+  // CSV/Q edits own the visible image and text fields, but a missing click target
+  // must never mean "delete the project link". The destination belongs to the
+  // section wrapper, independently of whichever image URL is currently shown.
   for (const item of seedSections || []) {
     const order = Number(item?.order);
-    if (!Number.isInteger(order) || order < 1 || byOrder.has(order)) continue;
-    byOrder.set(order, normalizedSection(item));
+    if (!Number.isInteger(order) || order < 1) continue;
+    const seeded = normalizedSection(item);
+    const current = byOrder.get(order);
+    if (!current) {
+      byOrder.set(order, seeded);
+      continue;
+    }
+    byOrder.set(order, normalizedSection({
+      ...seeded,
+      ...current,
+      image_link_url: String(current.image_link_url || "").trim() || String(seeded.image_link_url || "").trim(),
+    }));
   }
 
   page.sections = [...byOrder.values()].sort((a, b) => Number(a.order) - Number(b.order));
@@ -67,6 +77,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.12.2";
+truth.schema_version = "1.12.3";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved untouched PROPS, DESIGN, and project rows while applying CSV edits.");
+console.log("Preserved untouched rows and permanent project redirects while applying CSV edits.");
