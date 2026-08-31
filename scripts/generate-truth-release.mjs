@@ -33,6 +33,7 @@ const cleanKey = (value) => (value || "").trim().toLowerCase().replace(/[^a-z0-9
 const truthPath = path.join(root, "data", "truth.generated.json");
 const truth = JSON.parse(await readFile(truthPath, "utf8"));
 const csvRows = parseCsv(await readFile(path.join(root, "truth.csv"), "utf8"));
+const seed = JSON.parse(await readFile(path.join(root, "data", "portfolio-seed.json"), "utf8"));
 const first = csvRows.find((row) => !row.record_type || row.record_type === "block") || {};
 
 // Each editorial image/text section may lead to a deeper page. That destination
@@ -46,6 +47,21 @@ for (const row of csvRows.filter((item) => item.record_type === "page_section"))
   if (!section) continue;
   section.image_link_url = (row.section_link_url || "").trim();
 }
+
+// Social profile URLs come from truth.csv. Seed values are only placeholders
+// until the editor/user saves real social_link rows.
+const socialRows = csvRows.filter((item) => item.record_type === "social_link");
+const sourceSocials = socialRows.length
+  ? socialRows.map((row) => ({
+      platform: cleanKey(row.product_id),
+      label: (row.title || row.product_id || "Social").trim(),
+      url: (row.destination_url || "").trim(),
+    }))
+  : (seed.socials || []);
+truth.site ||= {};
+truth.site.socials = sourceSocials
+  .filter((item) => ["facebook", "instagram", "twitter"].includes(cleanKey(item.platform)) && item.url)
+  .map((item) => ({ platform: cleanKey(item.platform), label: item.label, url: item.url }));
 
 const homeLabel = (first.nav_home_label || "HOME").trim();
 const fixedKeys = new Set(["acting", "design", "resume", "contact"]);
@@ -101,6 +117,6 @@ for (const item of truth.site?.header_nav || []) {
   item.label = String(item.label || "").toUpperCase();
 }
 
-truth.schema_version = "1.10.1";
+truth.schema_version = "1.11.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Applied click-through destinations, page-copy punctuation, uppercase navigation, and landing-font override support.");
+console.log("Applied click-through destinations, social links, page-copy punctuation, uppercase navigation, and landing-font override support.");
