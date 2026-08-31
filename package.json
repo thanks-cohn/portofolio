@@ -22,6 +22,7 @@
     "typecheck": "rm -rf .next && tsc --noEmit",
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
     "build:cloudflare": "npm run truth:generate && npm run validate:catalog && npm run validate:targets && bash scripts/build-verified.sh && npm run validate:targets",
+    "build:cloudflare-pages": "npm run truth:generate && rm -rf out .next && NUME_BUILD_TARGET=cloudflare-pages NEXT_PUBLIC_NUME_TARGET=cloudflare-pages npx --no-install next build",
     "build:pages": "npm run truth:generate && rm -rf out .next && NUME_BUILD_TARGET=github-pages NEXT_PUBLIC_NUME_TARGET=github-pages npx --no-install next build && npm run validate:targets",
     "deploy:cloudflare": "npm run build:cloudflare && npx wrangler deploy dist/server/index.js --assets dist/client",
     "validate:targets": "node scripts/validate-targets.mjs"
