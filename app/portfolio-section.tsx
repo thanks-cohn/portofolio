@@ -52,8 +52,16 @@ type EditablePage = {
   sections?: PageSection[];
 };
 
+type PortfolioBlock = {
+  product_id: string;
+  order: number;
+  title: string;
+  image_url: string;
+  image_alt: string;
+};
+
 type QMeta = {
-  record: "page_text" | "page_section";
+  record: "block" | "page_text" | "page_section";
   product: string;
   field: string;
   order?: number;
@@ -79,16 +87,21 @@ function resolvedHref(value: string) {
   return resolveAssetPath(value);
 }
 
-// These four overview rows are structural portfolio navigation. Their click
-// destinations must survive image swaps, old CSV rows, or missing optional link
-// metadata. An explicit image_link_url may still override these defaults.
+// Overview editorial rows remain structural navigation on DESIGN. PROPS uses
+// its own four-card gallery below the unchanged introductory title/copy.
 function permanentProjectHref(pageKey: string, order: number) {
   const routes: Record<string, Record<number, string>> = {
-    acting: { 1: "/project-a/", 2: "/project-b/" },
     design: { 1: "/project-c/", 2: "/project-d/" },
   };
   return routes[pageKey]?.[order] || "";
 }
+
+const PROPS_PROJECT_ROUTES = [
+  "/project-a/",
+  "/project-b/",
+  "/project-e/",
+  "/project-f/",
+];
 
 function googleFamily(url: string) {
   if (!url) return undefined;
@@ -188,6 +201,11 @@ export function PortfolioSection({ section }: { section: string }) {
   const titleStyle = pageStyle.title ?? {};
   const kickerStyle = pageStyle.kicker ?? {};
   const bodyStyle = pageStyle.body ?? {};
+  const propsCards = key === "acting"
+    ? (truthData.blocks as unknown as PortfolioBlock[])
+      .filter((item) => Number(item.order) >= 1 && Number(item.order) <= 4)
+      .sort((a, b) => Number(a.order) - Number(b.order))
+    : [];
 
   const fontUrls: string[] = [...new Set(
     [
@@ -241,7 +259,47 @@ export function PortfolioSection({ section }: { section: string }) {
         ) : null}
       </div>
 
-      {sections.length ? (
+      {key === "acting" ? (
+        <div className="props-project-grid" aria-label="PROPS projects">
+          {propsCards.map((item, index) => {
+            const href = PROPS_PROJECT_ROUTES[index] || "";
+            return (
+              <a
+                key={item.product_id || item.order}
+                className="props-project-card"
+                href={resolvedHref(href)}
+                aria-label={`Open ${item.title || `project ${index + 1}`}`}
+              >
+                <span className="props-project-card-image">
+                  <img
+                    src={item.image_url}
+                    alt={item.image_alt || item.title || "Project image"}
+                    {...qAttrs({
+                      record: "block",
+                      product: item.product_id,
+                      order: item.order,
+                      field: "image_url",
+                      kind: "image",
+                      value: item.image_url,
+                    })}
+                  />
+                </span>
+                <h2
+                  className="props-project-card-title"
+                  {...qAttrs({
+                    record: "block",
+                    product: item.product_id,
+                    order: item.order,
+                    field: "title",
+                  })}
+                >
+                  {item.title}
+                </h2>
+              </a>
+            );
+          })}
+        </div>
+      ) : sections.length ? (
         <div className="portfolio-builder-sections" aria-label={`${page.title} content`}>
           {sections.map((item: PageSection) => {
             const imageHref = String(item.image_link_url || "").trim() || permanentProjectHref(key, item.order);
