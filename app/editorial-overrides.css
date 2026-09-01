@@ -110,21 +110,36 @@
   right: 8px !important;
 }
 
+/* Portfolio images always show the complete source image. The fixed editorial
+   frame may have a different aspect ratio, so any unused area becomes black
+   letterboxing/pillarboxing instead of cropping or stretching the artwork. */
+.portfolio-builder-image {
+  background: #000 !important;
+}
+
+.portfolio-builder-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center center;
+}
+
 .portfolio-builder-image-link {
   display: block;
   width: 100%;
   height: 100%;
   color: inherit;
   text-decoration: none;
+  background: #000;
 }
 
 .portfolio-builder-image-link img {
-  transition: transform .35s ease, opacity .35s ease;
+  transition: opacity .35s ease;
 }
 
 .portfolio-builder-image-link:hover img,
 .portfolio-builder-image-link:focus-visible img {
-  transform: scale(1.015);
+  transform: none;
   opacity: .94;
 }
 
