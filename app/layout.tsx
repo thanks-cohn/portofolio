@@ -5,12 +5,13 @@ import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
 import { QSiteMarkers } from "./q-site-markers";
 import { QFontEditorStable } from "./q-font-editor-stable";
-import { QMenuGrace } from "./q-menu-grace";
+import { QFontMenuBridge } from "./q-font-menu-bridge";
 import "./globals.css";
 import "./middle-row-only.css";
 import "./editorial-overrides.css";
 import "./q-site-editor.css";
 import "./q-font-editor.css";
+import "./q-font-menu-bridge.css";
 
 export const metadata: Metadata = {
   title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
@@ -34,7 +35,7 @@ export default function RootLayout({
         <QSiteMarkers />
         <QSiteEditor />
         <QFontEditorStable />
-        <QMenuGrace />
+        <QFontMenuBridge />
       </body>
     </html>
   );
