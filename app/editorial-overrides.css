@@ -173,6 +173,126 @@
   overflow-wrap: anywhere;
 }
 
+/* PROPS keeps its existing title/kicker/intro exactly as-is. Only the content
+   after that intro becomes the compact four-project index requested for this
+   page: image first, title immediately underneath, one row on desktop. */
+.props-project-grid {
+  width: min(1440px, 100%);
+  margin: 72px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 30px);
+  align-items: start;
+}
+
+.props-project-card {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.props-project-card-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #000;
+}
+
+.props-project-card-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: opacity .25s ease;
+}
+
+.props-project-card:hover .props-project-card-image img,
+.props-project-card:focus-visible .props-project-card-image img {
+  opacity: .88;
+}
+
+.props-project-card:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 5px;
+}
+
+.props-project-card-title {
+  margin: 12px 4px 0;
+  color: #f1eee7;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(14px, 1.35vw, 21px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  text-align: center;
+  text-transform: none;
+}
+
+/* Hidden PROPS case studies intentionally look like polished editorial pages
+   whose copy was never replaced. The giant green terminal title gives the
+   Matrix-like art direction without changing the real PROPS landing intro. */
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f
+) .portfolio-section-title {
+  color: #00ff41 !important;
+  font-family: "Share Tech Mono", "Courier New", monospace !important;
+  font-size: clamp(62px, 10vw, 138px) !important;
+  font-weight: 400 !important;
+  line-height: .82 !important;
+  letter-spacing: -.055em !important;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(0, 255, 65, .2);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f
+) :is(
+  .portfolio-section-kicker,
+  .portfolio-section-body,
+  .portfolio-builder-header,
+  .portfolio-builder-subheader,
+  .portfolio-builder-body
+) {
+  font-family: "Share Tech Mono", "Courier New", monospace !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f
+) .portfolio-builder-header {
+  color: #00ff41 !important;
+  letter-spacing: -.025em;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f
+) .portfolio-builder-subheader {
+  color: #00d936 !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f
+) :is(.portfolio-section-body, .portfolio-builder-body) {
+  color: #9dffaf !important;
+}
+
 /* Only the text paired with editorial images is centered. The page intro above
    remains governed by its own independent styling controls. */
 .portfolio-builder-copy {
@@ -207,6 +327,15 @@
     display: none;
   }
 
+  .props-project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 18px;
+  }
+
+  .props-project-card-title {
+    font-size: clamp(14px, 4vw, 19px);
+  }
+
   .portfolio-builder-copy {
     min-height: auto;
     padding: 4px 10px 0;
@@ -215,5 +344,11 @@
   .portfolio-builder-section.image-right .portfolio-builder-media,
   .portfolio-builder-section.image-right .portfolio-builder-copy {
     order: initial;
+  }
+}
+
+@media (max-width: 520px) {
+  .props-project-grid {
+    gap: 28px 12px;
   }
 }
