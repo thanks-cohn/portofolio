@@ -47,7 +47,9 @@
 
 :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section,
 :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section.image-right {
-  display: block !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(48px, auto);
+  align-content: start;
   min-width: 0;
 }
 
@@ -58,8 +60,9 @@
 }
 
 :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy {
-  display: block !important;
-  min-height: 0 !important;
+  display: grid !important;
+  min-height: 48px !important;
+  align-content: start;
   padding: 0 !important;
   text-align: center !important;
 }
@@ -84,7 +87,10 @@
 }
 
 :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image {
+  display: block;
+  box-sizing: border-box;
   width: 100%;
+  height: auto !important;
   min-height: 0 !important;
   aspect-ratio: 4 / 5;
   overflow: hidden;

@@ -213,71 +213,152 @@
   font: 400 14px/1.75 Arial, Helvetica, sans-serif;
 }
 
-/* Resume opens as a title card, then naturally glides down to the document after a beat. */
-.resume-page { background: var(--black); color: var(--ink); }
-.resume-intro {
-  min-height: 100vh;
-  padding: 140px 8vw 90px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 22px;
-  text-align: center;
+/* A compact editorial résumé: content is visible immediately, without an
+   animated title screen or auto-scroll competing with the page controls. */
+.resume-page {
+  min-height: 100svh;
+  padding: clamp(112px, 14vw, 170px) 20px clamp(72px, 9vw, 116px);
+  background:
+    radial-gradient(circle at 50% -12%, rgba(255,255,255,.06), transparent 34%),
+    var(--black);
+  color: var(--ink);
 }
-.resume-intro h1 {
-  margin: 0;
-  font-family: Georgia, serif;
-  font-size: clamp(62px, 12vw, 170px);
-  font-weight: 400;
-  line-height: .82;
-  letter-spacing: -.045em;
-}
-.resume-intro > span { color: var(--muted); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; }
 .resume-document {
-  scroll-margin-top: 90px;
-  width: min(1040px, calc(100% - 40px));
-  margin: 0 auto 110px;
-  padding: clamp(34px, 6vw, 76px);
-  background: #f1eee7;
-  color: #171614;
-  box-shadow: 0 28px 80px rgba(0,0,0,.34);
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: clamp(38px, 6vw, 72px);
+  background: #f2efe8;
+  color: #181715;
+  box-shadow: 0 32px 96px rgba(0,0,0,.42);
 }
 .resume-document-header {
+  padding-bottom: clamp(30px, 4vw, 46px);
+  border-bottom: 1px solid rgba(24,23,21,.32);
+}
+.resume-kicker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 26px;
+  font: 600 11px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.resume-kicker-row p,
+.resume-kicker-row span { margin: 0; }
+.resume-kicker-row span { color: #6b665f; text-align: right; }
+.resume-identity {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 40px;
+  gap: 42px;
   align-items: end;
-  padding-bottom: 28px;
-  border-bottom: 1px solid rgba(23,22,20,.28);
 }
-.resume-document-header p,
-.resume-document h3,
-.resume-place { margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
-.resume-document-header h2 {
-  max-width: 720px;
-  margin: 8px 0 0;
+.resume-identity h1 {
+  max-width: 760px;
+  margin: 0;
   font-family: Georgia, serif;
-  font-size: clamp(28px, 4vw, 52px);
+  font-size: clamp(42px, 6.4vw, 82px);
   font-weight: 400;
-  line-height: .95;
-  letter-spacing: -.035em;
+  line-height: .86;
+  letter-spacing: -.05em;
 }
-.resume-document address { font: 400 11px/1.6 Arial, Helvetica, sans-serif; text-align: right; font-style: normal; }
-.resume-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 34px 58px; padding-top: 34px; }
+.resume-headline {
+  margin: 15px 0 0;
+  color: #514d47;
+  font: 500 12px/1.5 Arial, Helvetica, sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.resume-document address {
+  display: grid;
+  gap: 5px;
+  font: 400 12px/1.45 Arial, Helvetica, sans-serif;
+  text-align: right;
+  font-style: normal;
+}
+.resume-document address a {
+  color: inherit;
+  text-decoration: none;
+}
+.resume-grid {
+  display: grid;
+  grid-template-columns: minmax(230px, .76fr) minmax(0, 1.4fr);
+  grid-template-areas:
+    "profile experience"
+    "skills experience"
+    "education credits"
+    "references credits";
+  gap: clamp(34px, 4vw, 54px) clamp(48px, 6vw, 76px);
+  padding-top: clamp(38px, 5vw, 58px);
+}
 .resume-grid section { min-width: 0; }
-.resume-grid section:nth-child(2),
-.resume-grid section:nth-child(3) { grid-column: 2; }
-.resume-grid section:nth-child(4),
-.resume-grid section:nth-child(5),
-.resume-grid section:nth-child(6) { grid-column: 1; }
-.resume-document h3 { margin-bottom: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(23,22,20,.18); }
+.resume-profile { grid-area: profile; }
+.resume-experience { grid-area: experience; }
+.resume-credits { grid-area: credits; }
+.resume-skills { grid-area: skills; }
+.resume-education { grid-area: education; }
+.resume-references { grid-area: references; }
+.resume-document h2 {
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(24,23,21,.2);
+  font: 700 11px/1.3 Arial, Helvetica, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
 .resume-document p,
-.resume-document li { font: 400 12px/1.58 Arial, Helvetica, sans-serif; }
-.resume-document ul { margin: 9px 0 0; padding-left: 18px; }
-.resume-document article + article { margin-top: 26px; }
-.resume-role { display: flex; justify-content: space-between; gap: 20px; font: 400 12px/1.4 Arial, Helvetica, sans-serif; }
-.resume-place { margin-top: 5px; color: #68645f; font-size: 8px; }
-.resume-credit-list { list-style: none; padding-left: 0 !important; }
+.resume-document li,
+.resume-skill-list {
+  font: 400 15px/1.68 Arial, Helvetica, sans-serif;
+}
+.resume-document section > p { margin: 0; }
+.resume-document ul { margin: 13px 0 0; padding-left: 19px; }
+.resume-document li + li { margin-top: 6px; }
+.resume-document article + article {
+  margin-top: 34px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(24,23,21,.13);
+}
+.resume-role {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  font: 400 14px/1.45 Arial, Helvetica, sans-serif;
+}
+.resume-role strong { font-weight: 700; }
+.resume-role > span { flex: 0 0 auto; color: #625d57; }
+.resume-place {
+  margin: 7px 0 0 !important;
+  color: #625d57;
+  font: 600 11px/1.45 Arial, Helvetica, sans-serif !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.resume-credit-list { margin-top: 0 !important; padding-left: 0 !important; list-style: none; }
+.resume-credit-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(24,23,21,.13);
+}
+.resume-credit-list li:first-child { padding-top: 0; }
+.resume-credit-list li span:first-child { font-family: Georgia, serif; font-size: 17px; }
+.resume-credit-list li span:last-child {
+  color: #625d57;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+.resume-skill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.resume-skill-list > span {
+  padding: 7px 9px 6px;
+  border: 1px solid rgba(24,23,21,.2);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: .04em;
+}
 
 @media (max-width: 900px) {
   .gallery { padding-top: clamp(175px, 24vh, 250px) !important; padding-bottom: clamp(175px, 24vh, 250px) !important; }
@@ -307,12 +388,24 @@
   .portfolio-builder-image-placeholder { min-height: 320px; }
   .portfolio-builder-header { font-size: clamp(32px, 11vw, 52px); }
   .portfolio-builder-body { font-size: 13px; }
-  .resume-intro { min-height: 100svh; padding: 110px 24px 70px; }
-  .resume-document { width: calc(100% - 24px); margin-bottom: 70px; padding: 28px 22px 38px; }
-  .resume-document-header,
+  .resume-page { padding: 96px 12px 64px; }
+  .resume-document { padding: 30px 22px 38px; }
+  .resume-kicker-row { display: grid; gap: 8px; padding-bottom: 28px; }
+  .resume-kicker-row span { text-align: left; }
+  .resume-identity,
   .resume-grid { grid-template-columns: 1fr; }
-  .resume-document-header { align-items: start; }
+  .resume-identity { gap: 24px; align-items: start; }
   .resume-document address { text-align: left; }
-  .resume-grid section,
-  .resume-grid section:nth-child(n) { grid-column: 1; }
+  .resume-grid {
+    grid-template-areas:
+      "profile"
+      "experience"
+      "credits"
+      "skills"
+      "education"
+      "references";
+    gap: 38px;
+  }
+  .resume-credit-list li { grid-template-columns: 1fr; gap: 3px; }
+  .resume-credit-list li span:last-child { text-align: left; }
 }
