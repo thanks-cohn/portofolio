@@ -25,8 +25,10 @@ try {
 
 const truthPath = path.join(root, "data", "truth.generated.json");
 const seedPath = path.join(root, "data", "portfolio-seed.json");
+const propsPlaceholderPath = path.join(root, "data", "props-project-placeholders.json");
 const truth = JSON.parse(await readFile(truthPath, "utf8"));
 const seed = JSON.parse(await readFile(seedPath, "utf8"));
+const propsPlaceholders = JSON.parse(await readFile(propsPlaceholderPath, "utf8"));
 
 const BASIC_FONT_PRESETS = {
   times: {
@@ -241,6 +243,27 @@ for (const item of seed.hidden_pages || []) {
   mergeSeedSections(page, item.sections || []);
 }
 
+// The two PROPS overview rows keep their real images and copy. They only gain
+// lightweight captions. Their linked project pages intentionally use obviously
+// fake, rough developer markup so the temporary nature of the content feels
+// human instead of sterile. Keeping this in a separate data file also makes the
+// placeholders easy to remove once real project content is ready.
+if (truth.pages?.acting && Array.isArray(truth.pages.acting.sections)) {
+  truth.pages.acting.sections = truth.pages.acting.sections.map((section) => {
+    const caption = propsPlaceholders.overview_captions?.[String(section.order)];
+    return caption ? { ...section, image_caption: caption } : section;
+  });
+}
+
+for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {})) {
+  const page = truth.pages?.[pageKey];
+  if (!page || !placeholder) continue;
+  page.title = String(placeholder.title || page.title || "");
+  page.kicker = String(placeholder.kicker || page.kicker || "");
+  page.body = String(placeholder.body || page.body || "");
+  page.sections = (placeholder.sections || []).map(normalizedSection);
+}
+
 const typographyRows = parseCsv(csvText)
   .filter((row) => row.record_type === "page_text" && String(row.product_id || "").trim() === "q-fonts")
   .map((row) => {
@@ -280,6 +303,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.15.2";
+truth.schema_version = "1.16.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects, isolated legacy generation from Q metadata, matched PROPS typography, and applied persistent typography assignments.");
+console.log("Preserved project redirects, isolated legacy generation from Q metadata, matched PROPS typography, applied rough project placeholders, and persistent typography assignments.");
