@@ -20,7 +20,9 @@
 .q-font-submenu {
   position: absolute;
   z-index: 10004;
-  left: calc(100% + 8px);
+  /* Keep the submenu physically touching FONT. The old 8px gap created a
+     dead hover strip that closed the menu before the pointer could reach it. */
+  left: 100%;
   top: 0;
   width: 132px;
   padding: 6px;
@@ -193,7 +195,8 @@ body.q-font-picking [data-q-edit="text"]:hover {
   .q-font-submenu {
     left: auto;
     right: 0;
-    top: calc(100% + 5px);
+    /* Same rule on touch layouts: no gap between FONT and SINGLE/MULTI. */
+    top: 100%;
     transform: translateY(-4px);
   }
 
