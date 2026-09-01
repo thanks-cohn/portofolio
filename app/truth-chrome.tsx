@@ -198,6 +198,9 @@ export function TruthChrome() {
     const fontGroups = new Map<string, string[]>();
     for (const rule of fontRules) {
       if (!rule.family) continue;
+      const usedOnThisPage = textSelectors(rule.scope, rule.product_id)
+        .some((selector) => document.querySelector(selector));
+      if (!usedOnThisPage) continue;
       const weights = fontGroups.get(rule.family) ?? [];
       weights.push(rule.weight || "400");
       fontGroups.set(rule.family, weights);
@@ -255,8 +258,9 @@ export function TruthChrome() {
       });
     };
 
-    const observer = new MutationObserver(scheduleTruthCopy);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    const dynamicGallery = Boolean(document.querySelector(".nume"));
+    const observer = dynamicGallery ? new MutationObserver(scheduleTruthCopy) : null;
+    observer?.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
     applyTruthCopy();
 
     const redirect = (event: Event) => {
@@ -271,12 +275,12 @@ export function TruthChrome() {
       if ("stopImmediatePropagation" in event) event.stopImmediatePropagation();
       window.location.assign(resolvedHref(block.destination_url));
     };
-    document.addEventListener("click", redirect, true);
+    if (dynamicGallery) document.addEventListener("click", redirect, true);
 
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
-      document.removeEventListener("click", redirect, true);
+      if (dynamicGallery) document.removeEventListener("click", redirect, true);
       style.remove();
       fontLinks.forEach((link) => link.remove());
     };

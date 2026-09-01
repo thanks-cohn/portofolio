@@ -312,8 +312,12 @@ function restoreTarget(target: FontIdentity) {
 }
 
 function applyTypography(target: FontIdentity, style: TypographyStyle) {
+  const nodes = document.querySelectorAll<HTMLElement>(selectorForTarget(target));
+  // Do not download a page's custom Google Font on every other route. Some
+  // saved font blocks contain many families and are expensive on a gallery.
+  if (!nodes.length) return;
   ensureFontLink(style.font?.href);
-  document.querySelectorAll<HTMLElement>(selectorForTarget(target)).forEach((node) => {
+  nodes.forEach((node) => {
     restoreNode(node);
 
     if (style.font?.family) {
@@ -444,6 +448,7 @@ export function QFontEditorStable() {
 
   useEffect(() => {
     applyAllTypography();
+    if (!document.querySelector(".nume")) return () => cancelSubmenuClose();
     let frame = 0;
     const observer = new MutationObserver(() => {
       if (frame) return;

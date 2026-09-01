@@ -190,8 +190,9 @@ export function QSiteMarkers() {
     };
 
     apply();
-    const observer = new MutationObserver(apply);
-    observer.observe(document.body, {
+    const dynamicGallery = Boolean(document.querySelector(".nume"));
+    const observer = dynamicGallery ? new MutationObserver(apply) : null;
+    observer?.observe(document.body, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -204,7 +205,7 @@ export function QSiteMarkers() {
     window.addEventListener("pointerup", onPointerEnd, { passive: true });
     window.addEventListener("pointercancel", onPointerEnd, { passive: true });
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       clearLongPress();
       if (protectFrame) window.cancelAnimationFrame(protectFrame);
       window.removeEventListener("scroll", scheduleProtect);

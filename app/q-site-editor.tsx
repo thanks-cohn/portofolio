@@ -302,11 +302,16 @@ export function QSiteEditor() {
     });
     scheduleFade();
     applyAllDraftsToDom();
-    const observer = new MutationObserver(applyAllDraftsToDom);
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Editorial/project pages are static after hydration. A permanent
+    // full-document observer there only repeats draft work when the Q menu
+    // opens and when images settle. Keep observation for the dynamic gallery
+    // homepage, but leave static pages idle.
+    const dynamicGallery = Boolean(document.querySelector(".nume"));
+    const observer = dynamicGallery ? new MutationObserver(applyAllDraftsToDom) : null;
+    observer?.observe(document.body, { childList: true, subtree: true });
     return () => {
       window.cancelAnimationFrame(positionFrame);
-      observer.disconnect();
+      observer?.disconnect();
       if (fadeTimer.current) window.clearTimeout(fadeTimer.current);
     };
   }, [scheduleFade]);

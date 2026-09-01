@@ -293,6 +293,10 @@ export function PortfolioSection({ section }: { section: string }) {
                   <img
                     src={item.image_url}
                     alt={item.image_alt || item.title || "Project image"}
+                    loading="lazy"
+                    decoding="async"
+                    width={1200}
+                    height={1500}
                     {...qAttrs({
                       record: "block",
                       product: item.product_id,
@@ -326,6 +330,10 @@ export function PortfolioSection({ section }: { section: string }) {
               <img
                 src={item.image_url}
                 alt={item.image_alt || ""}
+                loading="lazy"
+                decoding="async"
+                width={1200}
+                height={1500}
                 {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
               />
             ) : (
