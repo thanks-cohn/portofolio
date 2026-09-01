@@ -11,12 +11,19 @@ const SUBMENU_GRACE_MS = 7_000;
 type FontMode = "single" | "multi";
 type FontIdentity = { record: string; product: string; order: string; field: string };
 type FontTarget = FontIdentity & { element: HTMLElement };
-type ParsedFont = { href: string; family: string; families: string[]; raw: string };
+type FontStyle = {
+  href?: string;
+  family: string;
+  families?: string[];
+  raw?: string;
+  preset?: BasicFontPresetKey;
+  cssFamily?: string;
+};
 type SolidColor = { mode: "solid"; value: string };
 type GradientColor = { mode: "gradient"; start: string; end: string; angle: number };
 type TextColor = SolidColor | GradientColor;
 type TextSize = { mode: "h1" | "h2" | "h3" | "custom"; px?: number };
-type TypographyStyle = { font?: ParsedFont; color?: TextColor; size?: TextSize };
+type TypographyStyle = { font?: FontStyle; color?: TextColor; size?: TextSize };
 type StoredDraft = { record: string; product?: string; order?: string; field: string; kind?: string; value: string };
 type PublishedTypography = { target: FontIdentity; style: TypographyStyle };
 type StoredPayload = {
@@ -24,12 +31,64 @@ type StoredPayload = {
   revert?: boolean;
   fontInput?: string;
   fontFamily?: string;
+  fontPreset?: BasicFontPresetKey;
   color?: TextColor;
   size?: TextSize;
 };
-
 type BaseProperty = { value: string; priority: string };
 type BaseStyle = Record<string, BaseProperty>;
+
+const BASIC_FONT_PRESETS = {
+  times: {
+    label: "Times New Roman",
+    family: "Times New Roman",
+    cssFamily: "'Times New Roman', Times, serif",
+  },
+  calibri: {
+    label: "Calibri",
+    family: "Calibri",
+    cssFamily: "Calibri, 'Segoe UI', Arial, sans-serif",
+  },
+  arial: {
+    label: "Arial",
+    family: "Arial",
+    cssFamily: "Arial, Helvetica, sans-serif",
+  },
+  helvetica: {
+    label: "Helvetica",
+    family: "Helvetica",
+    cssFamily: "Helvetica, Arial, sans-serif",
+  },
+  georgia: {
+    label: "Georgia",
+    family: "Georgia",
+    cssFamily: "Georgia, 'Times New Roman', serif",
+  },
+  verdana: {
+    label: "Verdana",
+    family: "Verdana",
+    cssFamily: "Verdana, Geneva, sans-serif",
+  },
+  garamond: {
+    label: "Garamond",
+    family: "Garamond",
+    cssFamily: "Garamond, Georgia, serif",
+  },
+  courier: {
+    label: "Courier New",
+    family: "Courier New",
+    cssFamily: "'Courier New', Courier, monospace",
+  },
+  roboto: {
+    label: "Roboto",
+    family: "Roboto",
+    cssFamily: "Roboto, Arial, sans-serif",
+    href: "https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap",
+  },
+} as const;
+
+type BasicFontPresetKey = keyof typeof BASIC_FONT_PRESETS;
+type FontChoice = "keep" | "custom" | BasicFontPresetKey;
 
 const STYLE_PROPERTIES = [
   "font-family",
@@ -103,7 +162,21 @@ function targetFromTypographyDraft(field: string): FontIdentity | null {
   return { record, product, order, field: targetField };
 }
 
-function parseFontInput(value: string): ParsedFont | null {
+function fontFromPreset(key: string): FontStyle | null {
+  if (!(key in BASIC_FONT_PRESETS)) return null;
+  const presetKey = key as BasicFontPresetKey;
+  const preset = BASIC_FONT_PRESETS[presetKey];
+  return {
+    href: "href" in preset ? preset.href : undefined,
+    family: preset.family,
+    families: [preset.family],
+    raw: "href" in preset ? preset.href : "",
+    preset: presetKey,
+    cssFamily: preset.cssFamily,
+  };
+}
+
+function parseFontInput(value: string): FontStyle | null {
   const raw = String(value || "").trim();
   if (!raw) return null;
   const htmlMatches = [...raw.matchAll(/href\s*=\s*["'](https:\/\/fonts\.googleapis\.com\/[^"']+)["']/gi)];
@@ -133,16 +206,21 @@ function styleFromPayload(value: string): { style?: TypographyStyle; revert?: bo
   try {
     const payload = JSON.parse(raw) as StoredPayload;
     if (payload?.revert) return { revert: true };
+
     const style: TypographyStyle = {};
-    if (payload.fontInput) {
+    if (payload.fontPreset) {
+      const preset = fontFromPreset(payload.fontPreset);
+      if (preset) style.font = preset;
+    } else if (payload.fontInput) {
       const parsed = parseFontInput(payload.fontInput);
       if (parsed) {
-        const chosen = payload.fontFamily && parsed.families.includes(payload.fontFamily)
+        const chosen = payload.fontFamily && parsed.families?.includes(payload.fontFamily)
           ? payload.fontFamily
           : parsed.family;
         style.font = { ...parsed, family: chosen };
       }
     }
+
     if (payload.color?.mode === "solid" && payload.color.value) {
       style.color = { mode: "solid", value: payload.color.value };
     } else if (payload.color?.mode === "gradient" && payload.color.start && payload.color.end) {
@@ -153,6 +231,7 @@ function styleFromPayload(value: string): { style?: TypographyStyle; revert?: bo
         angle: Number.isFinite(Number(payload.color.angle)) ? Number(payload.color.angle) : 90,
       };
     }
+
     if (payload.size && ["h1", "h2", "h3", "custom"].includes(payload.size.mode)) {
       if (payload.size.mode === "custom") {
         const px = Number(payload.size.px);
@@ -161,6 +240,7 @@ function styleFromPayload(value: string): { style?: TypographyStyle; revert?: bo
         style.size = { mode: payload.size.mode };
       }
     }
+
     return Object.keys(style).length ? { style } : null;
   } catch {
     const legacyFont = parseFontInput(raw);
@@ -169,8 +249,10 @@ function styleFromPayload(value: string): { style?: TypographyStyle; revert?: bo
 }
 
 function payloadFromStyle(style: TypographyStyle): string {
-  const payload: StoredPayload = { v: 1 };
-  if (style.font) {
+  const payload: StoredPayload = { v: 2 };
+  if (style.font?.preset) {
+    payload.fontPreset = style.font.preset;
+  } else if (style.font) {
     payload.fontInput = style.font.raw || style.font.href;
     payload.fontFamily = style.font.family;
   }
@@ -190,7 +272,8 @@ function selectorForTarget(target: FontIdentity) {
   return parts.join("");
 }
 
-function ensureFontLink(href: string) {
+function ensureFontLink(href?: string) {
+  if (!href) return;
   const exists = Array.from(document.querySelectorAll<HTMLLinkElement>('link[data-q-font-stylesheet="true"]'))
     .some((link) => link.href === href);
   if (exists) return;
@@ -229,19 +312,23 @@ function restoreTarget(target: FontIdentity) {
 }
 
 function applyTypography(target: FontIdentity, style: TypographyStyle) {
-  if (style.font?.href) ensureFontLink(style.font.href);
+  ensureFontLink(style.font?.href);
   document.querySelectorAll<HTMLElement>(selectorForTarget(target)).forEach((node) => {
     restoreNode(node);
+
     if (style.font?.family) {
       const safeFamily = style.font.family.replace(/'/g, "\\'");
-      node.style.setProperty("font-family", `'${safeFamily}', sans-serif`, "important");
+      const cssFamily = style.font.cssFamily || `'${safeFamily}', sans-serif`;
+      node.style.setProperty("font-family", cssFamily, "important");
     }
+
     if (style.size) {
       const value = style.size.mode === "custom"
         ? `${Math.max(1, Number(style.size.px) || 1)}px`
         : PRESET_SIZES[style.size.mode];
       node.style.setProperty("font-size", value, "important");
     }
+
     if (style.color?.mode === "solid") {
       node.style.setProperty("color", style.color.value, "important");
     } else if (style.color?.mode === "gradient") {
@@ -259,7 +346,7 @@ function publishedTypography(): PublishedTypography[] {
   const next = (truthData as unknown as { q_typography?: PublishedTypography[] }).q_typography || [];
   if (next.length) return next.filter((item) => item?.target?.record && item?.target?.field && item?.style);
 
-  const legacy = (truthData as unknown as { q_fonts?: Array<{ target: FontIdentity; font: ParsedFont }> }).q_fonts || [];
+  const legacy = (truthData as unknown as { q_fonts?: Array<{ target: FontIdentity; font: FontStyle }> }).q_fonts || [];
   return legacy.map((item) => ({ target: item.target, style: { font: item.font } }));
 }
 
@@ -308,6 +395,7 @@ export function QFontEditorStable() {
   const [fontMode, setFontMode] = useState<FontMode | null>(null);
   const [selections, setSelections] = useState<FontTarget[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [fontChoice, setFontChoice] = useState<FontChoice>("keep");
   const [fontInput, setFontInput] = useState("");
   const [family, setFamily] = useState("");
   const [colorMode, setColorMode] = useState<"keep" | "solid" | "gradient">("keep");
@@ -339,7 +427,7 @@ export function QFontEditorStable() {
   }
 
   useEffect(() => {
-    if (!parsed?.families.length) {
+    if (!parsed?.families?.length) {
       setFamily("");
       return;
     }
@@ -385,6 +473,7 @@ export function QFontEditorStable() {
       if (!origin || origin.closest(".q-site-orb, .q-site-menu, .q-font-panel, .q-font-notice")) return;
       const found = targetFromElement(origin);
       if (!found) return;
+
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
@@ -419,27 +508,41 @@ export function QFontEditorStable() {
     return () => document.removeEventListener("click", click, true);
   }, [fontMode]);
 
+  function resetControls() {
+    setFontChoice("keep");
+    setFontInput("");
+    setFamily("");
+    setColorMode("keep");
+    setSizeMode("keep");
+  }
+
   function beginFontMode(nextMode: FontMode) {
     cancelSubmenuClose();
     clearSelectionClasses();
     setSelections([]);
+    resetControls();
     setFontMode(nextMode);
     setPanelOpen(nextMode === "multi");
     setSubmenuOpen(false);
-    setColorMode("keep");
-    setSizeMode("keep");
-    setNotice(nextMode === "single" ? "SINGLE TYPE: click one text item." : "MULTI TYPE: click every text item you want to change.");
+    setNotice(nextMode === "single"
+      ? "SINGLE TYPE: click one text item."
+      : "MULTI TYPE: click every text item you want to change.");
 
     const readOnly = Array.from(document.querySelectorAll<HTMLButtonElement>(".q-site-menu button"))
       .find((button) => button.textContent?.trim() === "READ ONLY");
     readOnly?.click();
   }
 
-  function cancelFontMode() {
+  function closePanel() {
     clearSelectionClasses();
     setSelections([]);
     setPanelOpen(false);
     setFontMode(null);
+    setNotice("");
+  }
+
+  function cancelFontMode() {
+    closePanel();
     setNotice("Typography selection cancelled.");
   }
 
@@ -463,15 +566,17 @@ export function QFontEditorStable() {
       return;
     }
 
-    let chosenFont: ParsedFont | undefined;
-    if (fontInput.trim()) {
+    let chosenFont: FontStyle | undefined;
+    if (fontChoice === "custom") {
       const currentParsed = parseFontInput(fontInput);
       if (!currentParsed) {
         setNotice("I could not read that Google Fonts block.");
         return;
       }
-      const selectedFamily = family || currentParsed.families[0];
+      const selectedFamily = family || currentParsed.families?.[0] || currentParsed.family;
       chosenFont = { ...currentParsed, family: selectedFamily };
+    } else if (fontChoice !== "keep") {
+      chosenFont = fontFromPreset(fontChoice) || undefined;
     }
 
     let chosenColor: TextColor | undefined;
@@ -540,6 +645,7 @@ export function QFontEditorStable() {
       setNotice("Select at least one text item to revert.");
       return;
     }
+
     for (const selected of selections) {
       const identity: FontIdentity = {
         record: selected.record,
@@ -547,9 +653,10 @@ export function QFontEditorStable() {
         order: selected.order,
         field: selected.field,
       };
-      storeDraft(identity, JSON.stringify({ v: 1, revert: true }));
+      storeDraft(identity, JSON.stringify({ v: 2, revert: true }));
       restoreTarget(identity);
     }
+
     const count = selections.length;
     clearSelectionClasses();
     setSelections([]);
@@ -595,25 +702,49 @@ export function QFontEditorStable() {
           <div className="q-font-panel-heading">
             <strong>{fontMode === "multi" ? "MULTI TYPE" : "SINGLE TYPE"}</strong>
             <span>{selections.length} SELECTED</span>
+            <button
+              type="button"
+              className="q-font-panel-close"
+              onClick={closePanel}
+              aria-label="Close typography editor"
+              title="Close"
+            >
+              ×
+            </button>
           </div>
 
           <label>
-            <span>GOOGLE FONTS BLOCK · OPTIONAL</span>
-            <textarea
-              value={fontInput}
-              onChange={(event) => setFontInput(event.target.value)}
-              rows={5}
-              placeholder={'Paste the complete <link rel="preconnect" ...> and <link href="https://fonts.googleapis.com/..."> block here.'}
-            />
-          </label>
-
-          <label>
-            <span>FONT FAMILY</span>
-            <select value={family} onChange={(event) => setFamily(event.target.value)} disabled={!parsed?.families.length}>
-              {!parsed?.families.length ? <option value="">Keep current font</option> : null}
-              {parsed?.families.map((item) => <option key={item} value={item}>{item}</option>)}
+            <span>FONT PRESET</span>
+            <select value={fontChoice} onChange={(event) => setFontChoice(event.target.value as FontChoice)}>
+              <option value="keep">KEEP CURRENT</option>
+              {Object.entries(BASIC_FONT_PRESETS).map(([key, preset]) => (
+                <option key={key} value={key}>{preset.label}</option>
+              ))}
+              <option value="custom">CUSTOM GOOGLE FONT</option>
             </select>
           </label>
+
+          {fontChoice === "custom" ? (
+            <>
+              <label>
+                <span>GOOGLE FONTS BLOCK</span>
+                <textarea
+                  value={fontInput}
+                  onChange={(event) => setFontInput(event.target.value)}
+                  rows={5}
+                  placeholder={'Paste the complete <link rel="preconnect" ...> and <link href="https://fonts.googleapis.com/..."> block here.'}
+                />
+              </label>
+
+              <label>
+                <span>FONT FAMILY</span>
+                <select value={family} onChange={(event) => setFamily(event.target.value)} disabled={!parsed?.families?.length}>
+                  {!parsed?.families?.length ? <option value="">Paste a Google Fonts block first</option> : null}
+                  {parsed?.families?.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
+              </label>
+            </>
+          ) : null}
 
           <label>
             <span>COLOR</span>
