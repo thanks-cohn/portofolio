@@ -44,10 +44,6 @@ const PROPS_PROJECT_ROUTES = [
   "/project-b/",
   "/project-e/",
   "/project-f/",
-  "/project-g/",
-  "/project-h/",
-  "/project-i/",
-  "/project-j/",
 ];
 
 function qAttrs(meta?: QMeta): HTMLAttributes<HTMLElement> & Record<string, string | number | undefined> {
@@ -161,7 +157,7 @@ export function PropsSection() {
   const kickerStyle = pageStyle.kicker ?? {};
   const bodyStyle = pageStyle.body ?? {};
   const cards = (truthData.blocks as unknown as PortfolioBlock[])
-    .filter((item) => Number(item.order) >= 1 && Number(item.order) <= 8)
+    .filter((item) => Number(item.order) >= 1 && Number(item.order) <= 4)
     .sort((a, b) => Number(a.order) - Number(b.order));
 
   const fontUrls = [...new Set([
@@ -205,7 +201,7 @@ export function PropsSection() {
         />
       </div>
 
-      <div className="props-project-grid props-project-grid-eight" aria-label="PROPS projects">
+      <div className="props-project-grid" aria-label="PROPS projects">
         {cards.map((item, index) => {
           const href = PROPS_PROJECT_ROUTES[index] || "";
           return (
