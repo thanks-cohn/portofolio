@@ -1,11 +1,123 @@
-import { access,readFile,readdir } from "node:fs/promises";import path from "node:path";
-const exists=async p=>access(p).then(()=>true,()=>false);const errors=[];
-if(await exists("app/api"))errors.push("app/api must not exist: server APIs belong behind target adapters");
-for(const root of ["app","lib"]){for(const file of await walk(root)){if(!/\.(?:ts|tsx|mjs)$/.test(file))continue;const text=await readFile(file,"utf8");if(text.includes('"use client"')&&/(?:from|import\()\s*["'][^"']*server\//.test(text))errors.push(`${file}: client imports server code`);}}
-const config=await readFile("next.config.ts","utf8");
-if(!config.includes('"github-pages"')||!config.includes('"cloudflare-pages"')||!/output\s*:\s*"export"/.test(config))errors.push("Static Pages export configuration is missing");
-const source=JSON.parse(await readFile("data/layout/marketplace-layout.v1.json","utf8"));const published=JSON.parse(await readFile("data/catalog-sync/published-layout.v1.json","utf8"));if(JSON.stringify(source)!==JSON.stringify(published))errors.push("source and published layout snapshots drifted");if(source.rows.at(-1)?.title!=="Q&A")errors.push("canonical Q&A row title is incorrect");
-if(await exists("out")){const files=await walk("out");if(files.some(x=>x.includes("/api/")))errors.push("Pages output contains an API route");const content=(await Promise.all(files.filter(x=>/\.(?:html|js)$/.test(x)).map(x=>readFile(x,"utf8")))).join("\n");if(/STRIPE_SECRET_KEY|node:fs|node:path/.test(content))errors.push("Pages output contains server-only material");const cloudflarePages=process.env.NUME_BUILD_TARGET==="cloudflare-pages";const expected=cloudflarePages?"/_next/":`/${process.env.NUME_PAGES_BASE_PATH||process.env.GITHUB_REPOSITORY?.split("/").at(-1)||"NUmE-platform"}/_next/`;if(!content.includes(expected))errors.push(`Pages assets do not use ${expected}`);if(!content.includes("Married to Beauty")||!content.includes("qa-slogan"))errors.push("Pages output lost the Q&A final-row composition");if(!content.includes("requestAnimationFrame")||!content.includes("visibilitychange"))errors.push("Pages output lost client-side ticker hydration");const acting=await readFile("out/acting/index.html","utf8").catch(()=>"");if((acting.match(/data-q-link-field="destination_url"/g)||[]).length!==4)errors.push("Props page must expose four editable project destinations");for(const key of ["project-a","project-b","project-e","project-f"]){const project=await readFile(`out/${key}/index.html`,"utf8").catch(()=>"");if(!project)errors.push(`Pages output is missing ${key}`);else{if((project.match(/data-q-field="image_url"/g)||[]).length!==8)errors.push(`${key} must render eight editable gallery images`);if((project.match(/data-q-link-field="section_link_url"/g)||[]).length!==8)errors.push(`${key} must render eight editable image links`);}}if(!content.includes("LINK URL")||!content.includes("data-q-link-field"))errors.push("Pages output lost URL editing support");}
-if(await exists("dist")){for(const required of ["dist/server/index.js","dist/.openai/hosting.json"])if(!await exists(required))errors.push(`Cloudflare artifact missing ${required}`);}
-if(errors.length){console.error(errors.join("\n"));process.exit(1)}console.log("Deployment boundaries valid (GitHub Pages, Cloudflare Pages, and any present target artifacts).");
-async function walk(root){if(!await exists(root))return[];const out=[];for(const entry of await readdir(root,{withFileTypes:true})){const p=path.join(root,entry.name);if(entry.isDirectory())out.push(...await walk(p));else out.push(p)}return out}
+import { access, readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+
+const exists = async (filePath) => access(filePath).then(() => true, () => false);
+const errors = [];
+
+if (await exists("app/api")) {
+  errors.push("app/api must not exist: server APIs belong behind target adapters");
+}
+
+for (const root of ["app", "lib"]) {
+  for (const file of await walk(root)) {
+    if (!/\.(?:ts|tsx|mjs)$/.test(file)) continue;
+    const text = await readFile(file, "utf8");
+    if (text.includes('"use client"') && /(?:from|import\()\s*["'][^"']*server\//.test(text)) {
+      errors.push(`${file}: client imports server code`);
+    }
+  }
+}
+
+const config = await readFile("next.config.ts", "utf8");
+if (
+  !config.includes('"github-pages"')
+  || !config.includes('"cloudflare-pages"')
+  || !/output\s*:\s*"export"/.test(config)
+) {
+  errors.push("Static Pages export configuration is missing");
+}
+
+const source = JSON.parse(await readFile("data/layout/marketplace-layout.v1.json", "utf8"));
+const published = JSON.parse(await readFile("data/catalog-sync/published-layout.v1.json", "utf8"));
+if (JSON.stringify(source) !== JSON.stringify(published)) {
+  errors.push("source and published layout snapshots drifted");
+}
+if (source.rows.at(-1)?.title !== "Q&A") {
+  errors.push("canonical Q&A row title is incorrect");
+}
+
+if (await exists("out")) {
+  const files = await walk("out");
+  if (files.some((file) => file.includes("/api/"))) {
+    errors.push("Pages output contains an API route");
+  }
+
+  const content = (await Promise.all(
+    files
+      .filter((file) => /\.(?:html|js)$/.test(file))
+      .map((file) => readFile(file, "utf8")),
+  )).join("\n");
+
+  if (/STRIPE_SECRET_KEY|node:fs|node:path/.test(content)) {
+    errors.push("Pages output contains server-only material");
+  }
+
+  const cloudflarePages = process.env.NUME_BUILD_TARGET === "cloudflare-pages";
+  const expected = cloudflarePages
+    ? "/_next/"
+    : `/${process.env.NUME_PAGES_BASE_PATH || process.env.GITHUB_REPOSITORY?.split("/").at(-1) || "NUmE-platform"}/_next/`;
+  if (!content.includes(expected)) {
+    errors.push(`Pages assets do not use ${expected}`);
+  }
+  if (!content.includes("Married to Beauty") || !content.includes("qa-slogan")) {
+    errors.push("Pages output lost the Q&A final-row composition");
+  }
+  if (!content.includes("requestAnimationFrame") || !content.includes("visibilitychange")) {
+    errors.push("Pages output lost client-side ticker hydration");
+  }
+
+  const acting = await readFile("out/acting/index.html", "utf8").catch(() => "");
+  if ((acting.match(/data-q-link-field="destination_url"/g) || []).length !== 4) {
+    errors.push("Props page must expose four editable project destinations");
+  }
+
+  const expectedGallerySizes = {
+    "project-a": 8,
+    "project-b": 8,
+    "project-e": 8,
+    "project-f": 6,
+  };
+  for (const [key, expectedSize] of Object.entries(expectedGallerySizes)) {
+    const project = await readFile(`out/${key}/index.html`, "utf8").catch(() => "");
+    if (!project) {
+      errors.push(`Pages output is missing ${key}`);
+      continue;
+    }
+    if ((project.match(/data-q-field="image_url"/g) || []).length !== expectedSize) {
+      errors.push(`${key} must render ${expectedSize} editable gallery images`);
+    }
+    if ((project.match(/data-q-link-field="section_link_url"/g) || []).length !== expectedSize) {
+      errors.push(`${key} must render ${expectedSize} editable image links`);
+    }
+  }
+
+  if (!content.includes("LINK URL") || !content.includes("data-q-link-field")) {
+    errors.push("Pages output lost URL editing support");
+  }
+}
+
+if (await exists("dist")) {
+  for (const required of ["dist/server/index.js", "dist/.openai/hosting.json"]) {
+    if (!await exists(required)) {
+      errors.push(`Cloudflare artifact missing ${required}`);
+    }
+  }
+}
+
+if (errors.length) {
+  console.error(errors.join("\n"));
+  process.exit(1);
+}
+
+console.log("Deployment boundaries valid (GitHub Pages, Cloudflare Pages, and any present target artifacts).");
+
+async function walk(root) {
+  if (!await exists(root)) return [];
+  const out = [];
+  for (const entry of await readdir(root, { withFileTypes: true })) {
+    const filePath = path.join(root, entry.name);
+    if (entry.isDirectory()) out.push(...await walk(filePath));
+    else out.push(filePath);
+  }
+  return out;
+}

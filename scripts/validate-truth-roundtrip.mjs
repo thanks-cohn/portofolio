@@ -83,8 +83,16 @@ for (const row of blocks) {
   }
 }
 
-for (const key of ["project-a", "project-b", "project-e", "project-f"]) {
-  if (truth.pages?.[key]?.sections?.length !== 8) errors.push(`${key} must generate exactly eight gallery images`);
+const expectedProjectGallerySizes = {
+  "project-a": 8,
+  "project-b": 8,
+  "project-e": 8,
+  "project-f": 6,
+};
+for (const [key, expectedSize] of Object.entries(expectedProjectGallerySizes)) {
+  if (truth.pages?.[key]?.sections?.length !== expectedSize) {
+    errors.push(`${key} must generate exactly ${expectedSize} gallery images`);
+  }
 }
 
 if (errors.length) {
@@ -92,4 +100,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Verified ${blocks.length} blocks, editable page copy, section content, URLs, and four eight-image Props galleries.`);
+console.log(`Verified ${blocks.length} blocks, editable page copy, section content, URLs, and all four Props galleries.`);

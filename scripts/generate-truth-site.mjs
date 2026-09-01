@@ -319,6 +319,10 @@ const propsRouteOrder = {
   "project-f": 4,
 };
 
+const omittedPropsSections = {
+  "project-f": new Set([4, 8]),
+};
+
 truth.pages ||= {};
 for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {})) {
   let page = truth.pages[pageKey];
@@ -355,7 +359,10 @@ for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {
     if (!Number.isInteger(order) || order < 1) continue;
     byOrder.set(order, csvSection(row, byOrder.get(order) || { order }));
   }
-  page.sections = [...byOrder.values()].sort((a, b) => Number(a.order) - Number(b.order));
+  const omittedOrders = omittedPropsSections[pageKey] || new Set();
+  page.sections = [...byOrder.values()]
+    .filter((item) => !omittedOrders.has(Number(item.order)))
+    .sort((a, b) => Number(a.order) - Number(b.order));
 }
 
 function internalRouteSegments(value) {
