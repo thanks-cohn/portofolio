@@ -108,8 +108,12 @@ function applyDraftToDom(draft: Draft) {
       return;
     }
     node.dataset.qValue = draft.value;
-    if (draft.kind === "image" && node instanceof HTMLImageElement) {
-      if (node.getAttribute("src") !== draft.value) node.setAttribute("src", draft.value);
+    if (draft.kind === "image") {
+      if (node instanceof HTMLImageElement) {
+        if (node.getAttribute("src") !== draft.value) node.setAttribute("src", draft.value);
+      } else {
+        node.textContent = draft.value.trim() ? "IMAGE READY — PUBLISH TO VIEW" : "ADD IMAGE";
+      }
       return;
     }
     if (node.textContent !== draft.value) node.textContent = draft.value;

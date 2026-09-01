@@ -329,7 +329,20 @@ export function PortfolioSection({ section }: { section: string }) {
                 {...qAttrs({ record: "page_section", product: key, order: item.order, field: "image_url", kind: "image", value: item.image_url })}
               />
             ) : (
-              <div className="portfolio-builder-image-placeholder">IMAGE</div>
+              <span
+                className="portfolio-builder-image-placeholder"
+                aria-label={`Add image for ${item.header || `gallery item ${item.order}`}`}
+                {...qAttrs({
+                  record: "page_section",
+                  product: key,
+                  order: item.order,
+                  field: "image_url",
+                  kind: "image",
+                  value: "",
+                })}
+              >
+                ADD IMAGE
+              </span>
             );
 
             return (
