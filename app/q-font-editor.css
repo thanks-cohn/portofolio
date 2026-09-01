@@ -1,0 +1,215 @@
+.q-font-menu-entry {
+  position: relative;
+  margin-top: 4px;
+  border-top: 1px solid rgba(242, 240, 233, .14);
+  padding-top: 5px;
+}
+
+.q-font-menu-entry > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.q-font-menu-entry > button span:last-child {
+  font-size: 16px;
+  line-height: 1;
+  opacity: .72;
+}
+
+.q-font-submenu {
+  position: absolute;
+  z-index: 10004;
+  left: calc(100% + 8px);
+  top: 0;
+  width: 132px;
+  padding: 6px;
+  border: 1px solid rgba(242, 240, 233, .2);
+  background: rgba(10, 10, 10, .98);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .46);
+  backdrop-filter: blur(16px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-4px);
+  transition: opacity .16s ease, transform .16s ease, visibility .16s;
+}
+
+.q-font-menu-entry:hover .q-font-submenu,
+.q-font-menu-entry:focus-within .q-font-submenu,
+.q-font-submenu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.q-font-submenu button {
+  width: 100%;
+  border: 0;
+  padding: 10px 11px;
+  background: transparent;
+  color: #f1eee7;
+  text-align: left;
+  font: 500 10px/1.2 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+
+.q-font-submenu button:hover,
+.q-font-submenu button:focus-visible {
+  background: #f1eee7;
+  color: #111;
+  outline: none;
+}
+
+.q-font-panel {
+  position: fixed;
+  z-index: 10003;
+  right: 24px;
+  bottom: 92px;
+  width: min(490px, calc(100vw - 32px));
+  padding: 17px;
+  border: 1px solid rgba(242, 240, 233, .22);
+  background: rgba(10, 10, 10, .985);
+  color: #f1eee7;
+  box-shadow: 0 24px 74px rgba(0, 0, 0, .58);
+  backdrop-filter: blur(18px);
+}
+
+.q-font-panel-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.q-font-panel-heading strong,
+.q-font-panel-heading span,
+.q-font-panel label > span {
+  font: 600 9px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .16em;
+}
+
+.q-font-panel-heading span {
+  color: #777;
+  font-weight: 500;
+}
+
+.q-font-panel label {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.q-font-panel textarea,
+.q-font-panel select {
+  width: 100%;
+  border: 1px solid rgba(242, 240, 233, .25);
+  border-radius: 0;
+  padding: 11px 12px;
+  background: #151515;
+  color: #f1eee7;
+  font: 400 12px/1.5 Arial, Helvetica, sans-serif;
+  outline: none;
+}
+
+.q-font-panel textarea {
+  min-height: 138px;
+  resize: vertical;
+}
+
+.q-font-panel textarea:focus,
+.q-font-panel select:focus {
+  border-color: rgba(242, 240, 233, .72);
+}
+
+.q-font-panel select:disabled { opacity: .55; }
+
+.q-font-panel small {
+  display: block;
+  margin-top: 10px;
+  color: #8c8b86;
+  font: 400 9px/1.45 Arial, Helvetica, sans-serif;
+}
+
+.q-font-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.q-font-panel-actions button {
+  border: 1px solid rgba(242, 240, 233, .25);
+  padding: 9px 13px;
+  background: transparent;
+  color: #f1eee7;
+  font: 500 9px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+
+.q-font-panel-actions button:last-child {
+  background: #f1eee7;
+  color: #111;
+}
+
+.q-font-panel-actions button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+body.q-font-picking [data-q-edit="text"] {
+  cursor: crosshair !important;
+}
+
+body.q-font-picking [data-q-edit="text"]:hover {
+  outline: 1px dashed rgba(255, 255, 255, .55);
+  outline-offset: 5px;
+}
+
+.q-font-selected {
+  outline: 2px solid rgba(242, 240, 233, .92) !important;
+  outline-offset: 6px !important;
+}
+
+.q-font-notice {
+  position: fixed;
+  z-index: 10005;
+  left: 50%;
+  bottom: 24px;
+  max-width: min(620px, calc(100vw - 40px));
+  border: 1px solid rgba(242, 240, 233, .18);
+  padding: 9px 13px;
+  background: rgba(10, 10, 10, .94);
+  color: #b4b2ad;
+  transform: translateX(-50%);
+  font: 400 10px/1.4 Arial, Helvetica, sans-serif;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .q-font-submenu {
+    left: auto;
+    right: 0;
+    top: calc(100% + 5px);
+    transform: translateY(-4px);
+  }
+
+  .q-font-menu-entry:hover .q-font-submenu,
+  .q-font-menu-entry:focus-within .q-font-submenu,
+  .q-font-submenu.is-open {
+    transform: translateY(0);
+  }
+
+  .q-font-panel {
+    right: 16px;
+    bottom: 82px;
+    width: calc(100vw - 32px);
+    max-height: calc(100svh - 110px);
+    overflow-y: auto;
+  }
+
+  .q-font-notice { bottom: 16px; }
+}
