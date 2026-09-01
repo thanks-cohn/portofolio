@@ -1,5 +1,5 @@
-import { PropsSection } from "../props-section";
+import { PortfolioSection } from "../portfolio-section";
 
 export default function ActingPage() {
-  return <PropsSection />;
+  return <PortfolioSection section="ACTING" />;
 }
