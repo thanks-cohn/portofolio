@@ -20,6 +20,8 @@ The experiment is in how little machinery is required to combine them.
 
 Quandranea asks a simpler question: **how close can the act of noticing a change be to making and publishing that change?**
 
+The broader collaboration model behind that question is what we call **the Q&A Method**.
+
 ## The Q
 
 The floating Q is the everyday editing interface.
@@ -58,11 +60,21 @@ Typography changes can also be **REVERTED**, returning the selected text to the 
 
 That is the point of the editor. It does not attempt to expose every implementation detail. It exposes the decisions a portfolio owner or collaborator is actually likely to make while looking at the finished page.
 
-## A lightweight collaboration model
+## The Q&A Method
 
-The Q is useful beyond this particular portfolio.
+**The Q&A Method** is the lightweight designer-client collaboration model that grew out of building Quandranea's portfolio.
 
-A traditional designer-client workflow often has a surprising amount of translation in it:
+It has a personal origin.
+
+This system was created while I was trying to help my girlfriend with her portfolio. The problem was not that she needed a more powerful CMS. The problem was that the normal handoff between a person who owns a site and a person who builds it creates too much distance.
+
+She could see exactly what she wanted changed. I could change it. But the path between those two facts still ran through screenshots, messages, explanations, code, Git, editors, and redeployments.
+
+The Q&A Method is named after the two of us and after that original collaboration: one person looking at the finished work and another trying to make changing it as immediate and painless as possible.
+
+The goal is not to replace the designer. It is to remove unnecessary translation between designer and client.
+
+A traditional workflow often looks like this:
 
 ```text
 client sees page
@@ -78,7 +90,7 @@ change is made
 new preview is sent back
 ```
 
-A small inline editing layer can collapse much of that conversation:
+The Q&A Method tries to collapse that conversation:
 
 ```text
 client sees page
@@ -92,13 +104,27 @@ designer/client review the same surface
 publish
 ```
 
+The designer still decides what is editable. Publishing can still require explicit authorization. The underlying design system and source code remain protected. But the client can participate at the level that matters to them: copy, imagery, typography, color, and presentation.
+
+That balance is central to the method:
+
+```text
+DESIGNER CONTROL
+      +
+CLIENT DIRECTNESS
+      +
+LIVE CONTEXT
+      +
+LIGHTWEIGHT PUBLISHING
+      =
+THE Q&A METHOD
+```
+
 This is not meant to replace a full CMS for every website. It is a deliberately lean option for sites where a huge administrative system would be more machinery than the project needs.
 
-For independent web designers, small studios, portfolios, campaign sites, artist sites, restaurants, local businesses, and other relatively focused websites, the model can create a much more direct working relationship with the client.
+For independent web designers, small studios, portfolios, campaign sites, artist sites, restaurants, local businesses, and other relatively focused websites, the method can create a much more direct working relationship with the client.
 
 Instead of teaching the client a page builder, handing them a complicated dashboard, or asking them to describe changes indirectly, the designer can give them a controlled editing layer attached to the thing they already understand: **their website**.
-
-The designer still decides what is editable. Publishing can still require explicit authorization. The underlying design system and source code remain protected. But the client can participate at the level that matters to them: copy, imagery, typography, color, and presentation.
 
 That makes the website not merely a deliverable, but a small shared workspace between the person who built it and the person who owns it.
 
@@ -155,6 +181,8 @@ website ↔ Q ↔ truth.csv ↔ GitHub ↔ deploy
 The public site remains lightweight and static. The editing layer appears only when somebody intentionally asks for it.
 
 That makes the experience feel less like "opening the CMS" and more like simply touching the thing that needs changing.
+
+The Q&A Method treats that reduced distance as a collaboration principle, not merely a UI trick.
 
 ## Design philosophy
 
@@ -277,8 +305,10 @@ The unusual part is no longer only the gallery.
 
 It is the idea that a deployed static website can carry its own tiny editing surface with it, remain read-only for ordinary visitors, and become writable only when the owner deliberately unlocks publishing.
 
-It also suggests a broader way for website creators to work with clients: keep the architecture lean, keep authority controlled, but let the client collaborate directly with the finished surface rather than communicating every visual change through another layer of software.
+The Q&A Method grew from a much smaller and more personal goal: **helping someone I love work on her own portfolio without making the tools become the work.**
+
+From there, it suggests a broader way for website creators to work with clients: keep the architecture lean, keep authority controlled, but let the client collaborate directly with the finished surface rather than communicating every visual change through another layer of software.
 
 **A website, a CMS, a preview, and a small collaboration space collapsed into the same surface.**
 
-That is the experiment.
+That is the Q&A Method.
