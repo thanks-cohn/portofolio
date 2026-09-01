@@ -9,13 +9,17 @@ const csvText = await readFile(truthCsvPath, "utf8");
 // q-fonts rows are internal metadata for the newer Q typography layer. The
 // legacy generator treats every page_text product_id as a real page and throws
 // on q-fonts, which prevents unrelated image/text publishes from deploying.
-// Hide those rows only while the legacy/release chain runs, then immediately
-// restore the complete CSV before applying the modern typography post-process.
-const legacyCsvText = csvText
-  .split(/\r?\n/)
-  .filter((line) => !line.startsWith("page_text,q-fonts,"))
-  .join("\n");
-const hidTypographyRows = legacyCsvText !== csvText;
+// Filter complete CSV records rather than physical lines because font payloads
+// can themselves contain newlines. The compatibility-safe generator can then
+// correctly identify and temporarily hide ordinary custom-page rows too.
+const csvRowsForLegacy = parseCsv(csvText);
+const csvHeader = csvRowsForLegacy.length ? Object.keys(csvRowsForLegacy[0]) : [];
+const legacyRows = csvRowsForLegacy.filter((row) => !(
+  row.record_type === "page_text"
+  && String(row.product_id || "").trim() === "q-fonts"
+));
+const legacyCsvText = csvHeader.length ? serializeCsv(legacyRows, csvHeader) : csvText;
+const hidTypographyRows = legacyRows.length !== csvRowsForLegacy.length;
 if (hidTypographyRows) await writeFile(truthCsvPath, legacyCsvText, "utf8");
 try {
   await import("./generate-truth-release.mjs");
@@ -90,6 +94,14 @@ function parseCsv(text) {
   const [header, ...body] = rows.filter((item) => item.some((value) => value !== ""));
   if (!header) return [];
   return body.map((values) => Object.fromEntries(header.map((key, index) => [key, values[index] ?? ""])));
+}
+
+function serializeCsv(rows, header) {
+  const escape = (value) => {
+    const text = String(value ?? "");
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  return `${header.map(escape).join(",")}\n${rows.map((row) => header.map((key) => escape(row[key])).join(",")).join("\n")}\n`;
 }
 
 function normalizeFontInput(value) {
@@ -331,6 +343,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.17.0";
+truth.schema_version = "1.17.1";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects, isolated legacy generation from Q metadata, kept the PROPS intro intact, generated four hidden case studies, and applied persistent typography assignments.");
+console.log("Preserved project redirects, filtered Q metadata with CSV-aware parsing, kept the PROPS intro intact, generated four hidden case studies, and applied persistent typography assignments.");
