@@ -12,6 +12,46 @@ const truth = JSON.parse(await readFile(truthPath, "utf8"));
 const seed = JSON.parse(await readFile(seedPath, "utf8"));
 const csvText = await readFile(path.join(root, "truth.csv"), "utf8");
 
+const BASIC_FONT_PRESETS = {
+  times: {
+    family: "Times New Roman",
+    cssFamily: "'Times New Roman', Times, serif",
+  },
+  calibri: {
+    family: "Calibri",
+    cssFamily: "Calibri, 'Segoe UI', Arial, sans-serif",
+  },
+  arial: {
+    family: "Arial",
+    cssFamily: "Arial, Helvetica, sans-serif",
+  },
+  helvetica: {
+    family: "Helvetica",
+    cssFamily: "Helvetica, Arial, sans-serif",
+  },
+  georgia: {
+    family: "Georgia",
+    cssFamily: "Georgia, 'Times New Roman', serif",
+  },
+  verdana: {
+    family: "Verdana",
+    cssFamily: "Verdana, Geneva, sans-serif",
+  },
+  garamond: {
+    family: "Garamond",
+    cssFamily: "Garamond, Georgia, serif",
+  },
+  courier: {
+    family: "Courier New",
+    cssFamily: "'Courier New', Courier, monospace",
+  },
+  roboto: {
+    family: "Roboto",
+    cssFamily: "Roboto, Arial, sans-serif",
+    href: "https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap",
+  },
+};
+
 function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -24,8 +64,8 @@ function parseCsv(text) {
       else if (ch === '"') quoted = false;
       else field += ch;
     } else if (ch === '"') quoted = true;
-    else if (ch === ',') { row.push(field); field = ""; }
-    else if (ch === '\n') { row.push(field.replace(/\r$/, "")); rows.push(row); row = []; field = ""; }
+    else if (ch === ",") { row.push(field); field = ""; }
+    else if (ch === "\n") { row.push(field.replace(/\r$/, "")); rows.push(row); row = []; field = ""; }
     else field += ch;
   }
   if (field.length || row.length) { row.push(field.replace(/\r$/, "")); rows.push(row); }
@@ -59,6 +99,20 @@ function normalizeFontInput(value) {
   }
 }
 
+function fontFromPreset(value) {
+  const key = String(value || "").trim();
+  const preset = BASIC_FONT_PRESETS[key];
+  if (!preset) return null;
+  return {
+    href: preset.href || "",
+    family: preset.family,
+    families: [preset.family],
+    raw: preset.href || "",
+    preset: key,
+    cssFamily: preset.cssFamily,
+  };
+}
+
 function decodePart(value) {
   try { return decodeURIComponent(value || ""); } catch { return value || ""; }
 }
@@ -80,7 +134,10 @@ function normalizeTypography(value) {
     if (payload?.revert) return { revert: true };
 
     const style = {};
-    if (payload?.fontInput) {
+    if (payload?.fontPreset) {
+      const font = fontFromPreset(payload.fontPreset);
+      if (font) style.font = font;
+    } else if (payload?.fontInput) {
       const font = normalizeFontInput(payload.fontInput);
       if (font) {
         const family = payload.fontFamily && font.families.includes(payload.fontFamily)
@@ -190,6 +247,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.14.0";
+truth.schema_version = "1.15.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects and applied persistent Q typography assignments.");
+console.log("Preserved project redirects and applied persistent Q typography assignments with basic font presets.");
