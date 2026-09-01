@@ -250,7 +250,24 @@ const typographyRows = parseCsv(csvText)
   })
   .filter(Boolean);
 
-truth.q_typography = typographyRows
+// A short-lived Q edit accidentally put Arial 20px on the second PROPS row's
+// subheader and body. Both PROPS rows already share the intended base treatment
+// (Cormorant Garamond subheader + DM Sans paragraph), so discard only that exact
+// accidental override. Any future deliberate Q style on these targets still works.
+const effectiveTypographyRows = typographyRows.filter((item) => {
+  const target = item?.target || {};
+  const style = item?.style || {};
+  const isSecondPropsCopy = target.record === "page_section"
+    && target.product === "acting"
+    && String(target.order) === "2"
+    && ["destination_label", "description"].includes(target.field);
+  const isAccidentalArial20 = style.font?.preset === "arial"
+    && style.size?.mode === "custom"
+    && Number(style.size?.px) === 20;
+  return !(isSecondPropsCopy && isAccidentalArial20);
+});
+
+truth.q_typography = effectiveTypographyRows
   .filter((item) => !item.revert && item.style)
   .map((item) => ({ target: item.target, style: item.style }));
 
@@ -263,6 +280,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.15.1";
+truth.schema_version = "1.15.2";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects, isolated legacy generation from Q metadata, and applied persistent typography assignments.");
+console.log("Preserved project redirects, isolated legacy generation from Q metadata, matched PROPS typography, and applied persistent typography assignments.");
