@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -243,25 +243,53 @@ for (const item of seed.hidden_pages || []) {
   mergeSeedSections(page, item.sections || []);
 }
 
-// The two PROPS overview rows keep their real images and copy. They only gain
-// lightweight captions. Their linked project pages intentionally use obviously
-// fake, rough developer markup so the temporary nature of the content feels
-// human instead of sterile. Keeping this in a separate data file also makes the
-// placeholders easy to remove once real project content is ready.
-if (truth.pages?.acting && Array.isArray(truth.pages.acting.sections)) {
-  truth.pages.acting.sections = truth.pages.acting.sections.map((section) => {
-    const caption = propsPlaceholders.overview_captions?.[String(section.order)];
-    return caption ? { ...section, image_caption: caption } : section;
-  });
+// PROPS itself remains untouched above the fold. Its lower area is rendered as
+// a four-card gallery directly from the first four portfolio blocks. Each card
+// opens one hidden case-study page. The case-study title follows the card title,
+// so editing the portfolio title automatically keeps the deeper page in sync.
+const propsRouteOrder = {
+  "project-a": 1,
+  "project-b": 2,
+  "project-e": 3,
+  "project-f": 4,
+};
+
+truth.pages ||= {};
+for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {})) {
+  let page = truth.pages[pageKey];
+  if (!page) {
+    page = truth.pages[pageKey] = {
+      title: "",
+      kicker: "",
+      body: "",
+      path: `/${pageKey}/`,
+      custom: true,
+      style: {},
+      sections: [],
+    };
+  }
+
+  const cardOrder = propsRouteOrder[pageKey];
+  const matchingBlock = (truth.blocks || []).find((item) => Number(item.order) === cardOrder);
+  page.title = String(matchingBlock?.title || placeholder.title || page.title || "");
+  page.kicker = String(placeholder.kicker || "BLAH BLAH blah blah bLah");
+  page.body = String(placeholder.body || "BLAH BLAH blah blah bLah");
+  page.style = placeholder.style || page.style || {};
+  page.sections = (placeholder.sections || []).map(normalizedSection);
 }
 
-for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {})) {
-  const page = truth.pages?.[pageKey];
-  if (!page || !placeholder) continue;
-  page.title = String(placeholder.title || page.title || "");
-  page.kicker = String(placeholder.kicker || page.kicker || "");
-  page.body = String(placeholder.body || page.body || "");
-  page.sections = (placeholder.sections || []).map(normalizedSection);
+// Ensure all four hidden PROPS destinations exist as static routes before the
+// Next build begins. These pages intentionally remain outside top navigation.
+for (const pageKey of Object.keys(propsPlaceholders.pages || {})) {
+  const dir = path.join(root, "app", pageKey);
+  await mkdir(dir, { recursive: true });
+  const importPath = path.relative(dir, path.join(root, "app", "portfolio-section")).replaceAll(path.sep, "/");
+  const rel = importPath.startsWith(".") ? importPath : `./${importPath}`;
+  await writeFile(
+    path.join(dir, "page.tsx"),
+    `import { PortfolioSection } from ${JSON.stringify(rel)};\n\nexport default function ProjectPage() {\n  return <PortfolioSection section=${JSON.stringify(pageKey)} />;\n}\n`,
+    "utf8",
+  );
 }
 
 const typographyRows = parseCsv(csvText)
@@ -303,6 +331,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.16.0";
+truth.schema_version = "1.17.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects, isolated legacy generation from Q metadata, matched PROPS typography, applied rough project placeholders, and persistent typography assignments.");
+console.log("Preserved project redirects, isolated legacy generation from Q metadata, kept the PROPS intro intact, generated four hidden case studies, and applied persistent typography assignments.");
