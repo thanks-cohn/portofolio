@@ -1,0 +1,49 @@
+.q-font-menu-entry-stable {
+  display: none !important;
+}
+
+.q-font-inline-entry {
+  margin-top: 4px;
+  border-top: 1px solid rgba(242, 240, 233, .14);
+  padding-top: 5px;
+}
+
+.q-font-inline-trigger,
+.q-font-inline-choices button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #f1eee7;
+  text-align: left;
+  font: 500 10px/1.2 Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  cursor: pointer;
+}
+
+.q-font-inline-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+}
+
+.q-font-inline-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 4px 6px 7px;
+}
+
+.q-font-inline-choices button {
+  padding: 9px 10px;
+  border: 1px solid rgba(242, 240, 233, .18);
+}
+
+.q-font-inline-trigger:hover,
+.q-font-inline-trigger:focus-visible,
+.q-font-inline-choices button:hover,
+.q-font-inline-choices button:focus-visible {
+  background: #f1eee7;
+  color: #111;
+  outline: none;
+}
