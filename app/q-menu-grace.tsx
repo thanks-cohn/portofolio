@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const GRACE_MS = 5_000;
+const GRACE_MS = 7_000;
 
 export function QMenuGrace() {
   useEffect(() => {
@@ -31,8 +31,9 @@ export function QMenuGrace() {
           return;
         }
 
-        // The original Q components close immediately on mouse leave. Stop that
-        // delegated React event here, then replay one only after the grace period.
+        // React's onMouseLeave is delegated from above this element. Intercept
+        // mouseout in CAPTURE phase so React never receives the original leave.
+        // Replay one deliberate leave only after the full seven-second grace.
         event.stopPropagation();
         cancelClose();
         const timer = window.setTimeout(() => {
@@ -48,12 +49,16 @@ export function QMenuGrace() {
         timers.set(element, timer);
       };
 
-      element.addEventListener("mouseover", onMouseOver);
-      element.addEventListener("mouseout", onMouseOut);
+      // Capture is critical here. A normal bubble listener runs too late and the
+      // Q menu can already have been removed by React before our delay begins.
+      element.addEventListener("mouseover", onMouseOver, true);
+      element.addEventListener("mouseout", onMouseOut, true);
     };
 
     const scan = () => {
-      document.querySelectorAll<HTMLElement>(".q-site-menu, .q-font-menu-entry").forEach(attachGrace);
+      document.querySelectorAll<HTMLElement>(
+        ".q-site-menu, .q-font-menu-entry, .q-font-submenu",
+      ).forEach(attachGrace);
     };
 
     scan();
