@@ -1,0 +1,226 @@
+.portfolio-section-acting .props-project-grid-eight {
+  row-gap: clamp(42px, 5vw, 76px);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.035), transparent 34%),
+    #0b0b0b;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-section-copy {
+  width: min(820px, 100%);
+  min-height: calc(82vh - 120px);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-section-title {
+  color: #f2eee8 !important;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(54px, 8.5vw, 112px) !important;
+  font-weight: 500 !important;
+  line-height: .86 !important;
+  letter-spacing: -.045em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-section-kicker {
+  color: #9d9891 !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: .22em !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-section-body {
+  max-width: 54ch !important;
+  color: #c6c0b8 !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-sections {
+  width: min(1180px, 100%);
+  gap: clamp(88px, 12vw, 160px);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-section {
+  gap: clamp(38px, 6vw, 86px);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-media {
+  position: relative;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-image {
+  border: 1px solid rgba(242,238,232,.08);
+  background: #111 !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.28);
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-image img {
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-header {
+  color: #f2eee8 !important;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(38px, 4.7vw, 62px) !important;
+  font-weight: 500 !important;
+  line-height: .96 !important;
+  letter-spacing: -.035em !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-subheader {
+  color: #aaa39a !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: .18em !important;
+}
+
+:is(
+  .portfolio-section-project-a,
+  .portfolio-section-project-b,
+  .portfolio-section-project-e,
+  .portfolio-section-project-f,
+  .portfolio-section-project-g,
+  .portfolio-section-project-h,
+  .portfolio-section-project-i,
+  .portfolio-section-project-j
+) .portfolio-builder-body {
+  max-width: 40ch !important;
+  color: #c6c0b8 !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.78 !important;
+}
+
+@media (max-width: 900px) {
+  .portfolio-section-acting .props-project-grid-eight {
+    row-gap: 38px;
+  }
+
+  :is(
+    .portfolio-section-project-a,
+    .portfolio-section-project-b,
+    .portfolio-section-project-e,
+    .portfolio-section-project-f,
+    .portfolio-section-project-g,
+    .portfolio-section-project-h,
+    .portfolio-section-project-i,
+    .portfolio-section-project-j
+  ) .portfolio-section-copy {
+    min-height: calc(78svh - 80px);
+  }
+}
