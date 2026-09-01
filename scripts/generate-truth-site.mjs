@@ -3,14 +3,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const truthCsvPath = path.join(root, "truth.csv");
+const csvText = await readFile(truthCsvPath, "utf8");
 
-await import("./generate-truth-release.mjs");
+// q-fonts rows are internal metadata for the newer Q typography layer. The
+// legacy generator treats every page_text product_id as a real page and throws
+// on q-fonts, which prevents unrelated image/text publishes from deploying.
+// Hide those rows only while the legacy/release chain runs, then immediately
+// restore the complete CSV before applying the modern typography post-process.
+const legacyCsvText = csvText
+  .split(/\r?\n/)
+  .filter((line) => !line.startsWith("page_text,q-fonts,"))
+  .join("\n");
+const hidTypographyRows = legacyCsvText !== csvText;
+if (hidTypographyRows) await writeFile(truthCsvPath, legacyCsvText, "utf8");
+try {
+  await import("./generate-truth-release.mjs");
+} finally {
+  if (hidTypographyRows) await writeFile(truthCsvPath, csvText, "utf8");
+}
 
 const truthPath = path.join(root, "data", "truth.generated.json");
 const seedPath = path.join(root, "data", "portfolio-seed.json");
 const truth = JSON.parse(await readFile(truthPath, "utf8"));
 const seed = JSON.parse(await readFile(seedPath, "utf8"));
-const csvText = await readFile(path.join(root, "truth.csv"), "utf8");
 
 const BASIC_FONT_PRESETS = {
   times: {
@@ -247,6 +263,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.15.0";
+truth.schema_version = "1.15.1";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects and applied persistent Q typography assignments with basic font presets.");
+console.log("Preserved project redirects, isolated legacy generation from Q metadata, and applied persistent typography assignments.");
