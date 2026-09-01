@@ -24,17 +24,29 @@ export function QMenuGrace() {
 
       const onMouseOut = (event: MouseEvent) => {
         const next = event.relatedTarget;
-        if (next instanceof Node && element.contains(next)) return;
+
+        // FONT is mounted into the Q menu through a React portal. It is a real
+        // DOM descendant, but React's synthetic enter/leave system can still
+        // interpret the transition as leaving the parent component tree. When
+        // the pointer is moving to ANY DOM descendant, swallow mouseout before
+        // React can manufacture that false onMouseLeave. This is the critical
+        // case for Q menu -> FONT and FONT -> SINGLE/MULTI.
+        if (next instanceof Node && element.contains(next)) {
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          cancelClose();
+          return;
+        }
 
         if (allowNextLeave.has(element)) {
           allowNextLeave.delete(element);
           return;
         }
 
-        // React's onMouseLeave is delegated from above this element. Intercept
-        // mouseout in CAPTURE phase so React never receives the original leave.
-        // Replay one deliberate leave only after the full seven-second grace.
+        // A genuine exit gets the requested seven-second grace. React never
+        // receives the original leave; one deliberate leave is replayed later.
         event.stopPropagation();
+        event.stopImmediatePropagation();
         cancelClose();
         const timer = window.setTimeout(() => {
           timers.delete(element);
@@ -49,8 +61,8 @@ export function QMenuGrace() {
         timers.set(element, timer);
       };
 
-      // Capture is critical here. A normal bubble listener runs too late and the
-      // Q menu can already have been removed by React before our delay begins.
+      // Capture is critical: this must happen before React's delegated
+      // enter/leave handling sees the native mouseout.
       element.addEventListener("mouseover", onMouseOver, true);
       element.addEventListener("mouseout", onMouseOut, true);
     };
