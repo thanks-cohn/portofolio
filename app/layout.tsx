@@ -14,6 +14,7 @@ import "./q-site-editor.css";
 import "./q-font-editor.css";
 import "./q-font-menu-bridge.css";
 import "./props-case-studies.css";
+import "./hide-prices.css";
 
 const faviconHref = resolveAssetPath(faviconData.href || "/favicon.svg");
 
