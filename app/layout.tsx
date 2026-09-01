@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import truthData from "../data/truth.generated.json";
+import faviconData from "../data/favicon.generated.json";
 import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
@@ -13,12 +14,14 @@ import "./q-site-editor.css";
 import "./q-font-editor.css";
 import "./q-font-menu-bridge.css";
 
+const faviconHref = resolveAssetPath(faviconData.href || "/favicon.svg");
+
 export const metadata: Metadata = {
-  title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
+  title: truthData.site.row_heading,
   description: `${truthData.site.row_heading} portfolio`,
   icons: {
-    icon: resolveAssetPath("/jester-cry-laugh.svg"),
-    shortcut: resolveAssetPath("/jester-cry-laugh.svg"),
+    icon: faviconHref,
+    shortcut: faviconHref,
   },
 };
 
