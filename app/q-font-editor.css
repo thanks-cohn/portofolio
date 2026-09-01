@@ -20,8 +20,6 @@
 .q-font-submenu {
   position: absolute;
   z-index: 10004;
-  /* Keep the submenu physically touching FONT. The old 8px gap created a
-     dead hover strip that closed the menu before the pointer could reach it. */
   left: 100%;
   top: 0;
   width: 132px;
@@ -68,7 +66,9 @@
   z-index: 10003;
   right: 24px;
   bottom: 92px;
-  width: min(490px, calc(100vw - 32px));
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100svh - 120px);
+  overflow-y: auto;
   padding: 17px;
   border: 1px solid rgba(242, 240, 233, .22);
   background: rgba(10, 10, 10, .985);
@@ -87,7 +87,8 @@
 
 .q-font-panel-heading strong,
 .q-font-panel-heading span,
-.q-font-panel label > span {
+.q-font-panel label > span,
+.q-font-panel .q-font-gradient-grid label > span {
   font: 600 9px/1 Arial, Helvetica, sans-serif;
   letter-spacing: .16em;
 }
@@ -104,7 +105,9 @@
 }
 
 .q-font-panel textarea,
-.q-font-panel select {
+.q-font-panel select,
+.q-font-panel input[type="text"],
+.q-font-panel input[type="number"] {
   width: 100%;
   border: 1px solid rgba(242, 240, 233, .25);
   border-radius: 0;
@@ -115,13 +118,24 @@
   outline: none;
 }
 
+.q-font-panel input[type="color"] {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(242, 240, 233, .25);
+  border-radius: 0;
+  padding: 3px;
+  background: #151515;
+  cursor: pointer;
+}
+
 .q-font-panel textarea {
-  min-height: 138px;
+  min-height: 112px;
   resize: vertical;
 }
 
 .q-font-panel textarea:focus,
-.q-font-panel select:focus {
+.q-font-panel select:focus,
+.q-font-panel input:focus {
   border-color: rgba(242, 240, 233, .72);
 }
 
@@ -132,6 +146,31 @@
   margin-top: 10px;
   color: #8c8b86;
   font: 400 9px/1.45 Arial, Helvetica, sans-serif;
+}
+
+.q-font-color-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 10px;
+  align-items: end;
+}
+
+.q-font-gradient-grid {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 0 10px;
+  align-items: end;
+}
+
+.q-font-gradient-grid .q-font-angle-field {
+  grid-column: 1 / 2;
+}
+
+.q-font-gradient-preview {
+  grid-column: 2 / 3;
+  min-height: 40px;
+  margin-top: 13px;
+  border: 1px solid rgba(242, 240, 233, .25);
 }
 
 .q-font-panel-actions {
@@ -154,6 +193,10 @@
 .q-font-panel-actions button:last-child {
   background: #f1eee7;
   color: #111;
+}
+
+.q-font-panel-actions .q-font-revert {
+  border-color: rgba(255, 173, 173, .35);
 }
 
 .q-font-panel-actions button:disabled {
@@ -195,7 +238,6 @@ body.q-font-picking [data-q-edit="text"]:hover {
   .q-font-submenu {
     left: auto;
     right: 0;
-    /* Same rule on touch layouts: no gap between FONT and SINGLE/MULTI. */
     top: 100%;
     transform: translateY(-4px);
   }
@@ -211,7 +253,11 @@ body.q-font-picking [data-q-edit="text"]:hover {
     bottom: 82px;
     width: calc(100vw - 32px);
     max-height: calc(100svh - 110px);
-    overflow-y: auto;
+  }
+
+  .q-font-color-row,
+  .q-font-gradient-grid {
+    grid-template-columns: 78px 1fr;
   }
 
   .q-font-notice { bottom: 16px; }
