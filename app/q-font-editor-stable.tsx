@@ -427,11 +427,11 @@ export function QFontEditorStable() {
   }
 
   useEffect(() => {
-    if (!parsed?.families?.length) {
-      setFamily("");
-      return;
-    }
-    if (!parsed.families.includes(family)) setFamily(parsed.families[0]);
+    const timer = window.setTimeout(() => {
+      if (!parsed?.families?.length) setFamily("");
+      else if (!parsed.families.includes(family)) setFamily(parsed.families[0]);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [parsed, family]);
 
   useEffect(() => {

@@ -21,6 +21,17 @@ function mark(
   if (options.value !== undefined) node.dataset.qValue = options.value;
 }
 
+function markLink(
+  node: Element | null,
+  options: { record: "block" | "global"; field: string; product?: string; value?: string },
+) {
+  if (!(node instanceof HTMLElement)) return;
+  node.dataset.qLinkRecord = options.record;
+  node.dataset.qLinkField = options.field;
+  if (options.product) node.dataset.qLinkProduct = options.product;
+  if (options.value !== undefined) node.dataset.qLinkValue = options.value;
+}
+
 function protectQFromFooter() {
   const orb = document.querySelector<HTMLElement>(".q-site-orb");
   const footer = document.querySelector<HTMLElement>(".truth-footer");
@@ -121,7 +132,14 @@ export function QSiteMarkers() {
       document.querySelectorAll<HTMLElement>(".truth-nav a").forEach((anchor, index) => {
         const pageKey = navItems[index]?.page_key || "";
         const field = fixedNavFields[pageKey];
-        if (field) mark(anchor, { record: "global", field });
+        if (field) {
+          mark(anchor, { record: "global", field });
+          markLink(anchor, {
+            record: "global",
+            field: field.replace(/_label$/, "_url"),
+            value: anchor.dataset.qLinkValue || anchor.getAttribute("href") || "",
+          });
+        }
       });
 
       document.querySelectorAll<HTMLElement>('.tile[data-product-id]').forEach((tile) => {
@@ -155,6 +173,17 @@ export function QSiteMarkers() {
             value: heroImage.getAttribute("src") || heroImage.currentSrc || heroImage.src,
           });
         }
+        const selectedBlock = (truthData.blocks as Array<{ product_id: string; destination_url?: string }>).find(
+          (item) => item.product_id === selectedProduct,
+        );
+        document.querySelectorAll<HTMLElement>(".hero-action, .mobile-hero-action").forEach((action) => {
+          markLink(action, {
+            record: "block",
+            product: selectedProduct,
+            field: "destination_url",
+            value: selectedBlock?.destination_url || "",
+          });
+        });
       }
 
       scheduleProtect();

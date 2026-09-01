@@ -217,6 +217,57 @@ function normalizedSection(item) {
   };
 }
 
+function csvTextValue(rows, field, fallback = "") {
+  const row = rows.find((item) => String(item.title || "").trim() === field);
+  return row ? String(row.description ?? "") : fallback;
+}
+
+function csvSection(row, fallback = {}) {
+  return normalizedSection({
+    ...fallback,
+    order: Number(row.order) || Number(fallback.order) || 1,
+    image_side: ["left", "right"].includes(String(row.availability || "").toLowerCase())
+      ? String(row.availability).toLowerCase()
+      : (fallback.image_side || "left"),
+    image_url: row.image_url || "",
+    image_alt: row.image_alt || "",
+    image_caption: row.image_caption || "",
+    image_link_url: row.section_link_url || "",
+    header: row.title || "",
+    subheader: row.destination_label || "",
+    body: row.description || "",
+    header_tag: row.font_scope || fallback.header_tag || "h2",
+    subheader_tag: row.font_product_id || fallback.subheader_tag || "h3",
+    body_tag: row.color_scope || fallback.body_tag || "p",
+    header_color: row.text_color || "",
+    subheader_color: row.color_product_id || "",
+    body_color: row.footer_icon_ref || "",
+    header_font_url: row.destination_url || "",
+    subheader_font_url: row.footer_icon_label || "",
+    body_font_url: row.footer_icon_url || "",
+    header_size: row.header_size || null,
+    subheader_size: row.subheader_size || null,
+    body_size: row.body_size || null,
+  });
+}
+
+function applyCsvPageStyle(page, pageKey) {
+  const rows = csvRowsForLegacy.filter((row) =>
+    row.record_type === "page_style" && String(row.product_id || "").trim() === pageKey,
+  );
+  page.style ||= {};
+  for (const row of rows) {
+    const match = /^(title|kicker|body)_(tag|color|size|font_url)$/.exec(String(row.title || "").trim());
+    if (!match) continue;
+    const [, target, property] = match;
+    page.style[target] ||= {};
+    const value = String(row.description ?? "");
+    page.style[target][property === "font_url" ? "font_url" : property] = property === "size"
+      ? (Number(value) || null)
+      : value;
+  }
+}
+
 function mergeSeedSections(page, seedSections) {
   if (!page) return;
   const existing = Array.isArray(page.sections) ? page.sections : [];
@@ -235,11 +286,9 @@ function mergeSeedSections(page, seedSections) {
       byOrder.set(order, seeded);
       continue;
     }
-    byOrder.set(order, normalizedSection({
-      ...seeded,
-      ...current,
-      image_link_url: String(current.image_link_url || "").trim() || String(seeded.image_link_url || "").trim(),
-    }));
+    // Existing CSV-derived values win even when intentionally blank. Falling
+    // back on emptiness made it impossible for Q to clear a link or caption.
+    byOrder.set(order, normalizedSection({ ...seeded, ...current }));
   }
 
   page.sections = [...byOrder.values()].sort((a, b) => Number(a.order) - Number(b.order));
@@ -287,17 +336,42 @@ for (const [pageKey, placeholder] of Object.entries(propsPlaceholders.pages || {
 
   const cardOrder = propsRouteOrder[pageKey];
   const matchingBlock = (truth.blocks || []).find((item) => Number(item.order) === cardOrder);
-  page.title = String(matchingBlock?.title || placeholder.title || page.title || "");
-  page.kicker = String(placeholder.kicker || "BLAH BLAH blah blah bLah");
-  page.body = String(placeholder.body || "BLAH BLAH blah blah bLah");
-  page.style = placeholder.style || page.style || {};
-  page.sections = (placeholder.sections || []).map(normalizedSection);
+  const textRows = csvRowsForLegacy.filter((row) =>
+    row.record_type === "page_text" && String(row.product_id || "").trim() === pageKey,
+  );
+  page.title = csvTextValue(textRows, "title", String(matchingBlock?.title || placeholder.title || page.title || ""));
+  page.kicker = csvTextValue(textRows, "kicker", String(placeholder.kicker || page.kicker || ""));
+  page.body = csvTextValue(textRows, "body", String(placeholder.body || page.body || ""));
+  page.style = structuredClone(placeholder.style || page.style || {});
+  applyCsvPageStyle(page, pageKey);
+
+  const defaults = (placeholder.sections || []).map(normalizedSection);
+  const byOrder = new Map(defaults.map((item) => [Number(item.order), item]));
+  const sectionRows = csvRowsForLegacy.filter((row) =>
+    row.record_type === "page_section" && String(row.product_id || "").trim() === pageKey,
+  );
+  for (const row of sectionRows) {
+    const order = Number(row.order);
+    if (!Number.isInteger(order) || order < 1) continue;
+    byOrder.set(order, csvSection(row, byOrder.get(order) || { order }));
+  }
+  page.sections = [...byOrder.values()].sort((a, b) => Number(a.order) - Number(b.order));
 }
 
-// Ensure all four hidden PROPS destinations exist as static routes before the
-// Next build begins. These pages intentionally remain outside top navigation.
-for (const pageKey of Object.keys(propsPlaceholders.pages || {})) {
-  const dir = path.join(root, "app", pageKey);
+function internalRouteSegments(value) {
+  const raw = String(value || "").trim();
+  if (!raw || /^(?:https?:)?\/\//i.test(raw) || /^(?:mailto|tel):/i.test(raw) || raw.startsWith("#")) return [];
+  return raw
+    .split(/[?#]/, 1)[0]
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .map((segment) => segment.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, ""))
+    .filter(Boolean);
+}
+
+async function writeProjectRoute(segments, pageKey) {
+  if (!segments.length) return;
+  const dir = path.join(root, "app", ...segments);
   await mkdir(dir, { recursive: true });
   const importPath = path.relative(dir, path.join(root, "app", "portfolio-section")).replaceAll(path.sep, "/");
   const rel = importPath.startsWith(".") ? importPath : `./${importPath}`;
@@ -306,6 +380,17 @@ for (const pageKey of Object.keys(propsPlaceholders.pages || {})) {
     `import { PortfolioSection } from ${JSON.stringify(rel)};\n\nexport default function ProjectPage() {\n  return <PortfolioSection section=${JSON.stringify(pageKey)} />;\n}\n`,
     "utf8",
   );
+}
+
+// Ensure all four hidden PROPS destinations exist as static routes before the
+// Next build begins. A Q-edited internal destination also becomes a generated
+// alias, so changing a card URL cannot create a dead link.
+for (const pageKey of Object.keys(propsPlaceholders.pages || {})) {
+  await writeProjectRoute([pageKey], pageKey);
+  const cardOrder = propsRouteOrder[pageKey];
+  const matchingBlock = (truth.blocks || []).find((item) => Number(item.order) === cardOrder);
+  const editedSegments = internalRouteSegments(matchingBlock?.destination_url);
+  if (editedSegments.join("/") !== pageKey) await writeProjectRoute(editedSegments, pageKey);
 }
 
 const typographyRows = parseCsv(csvText)

@@ -134,9 +134,11 @@ if (headingFont) {
 }
 
 if (truth.pages.acting && seed.props) {
-  truth.pages.acting.title = seed.props.title;
-  truth.pages.acting.kicker = seed.props.kicker;
-  truth.pages.acting.body = seed.props.body;
+  // Seed values are fallbacks only. Q writes page copy into truth.csv, and the
+  // generated page must never replace those published values on the next build.
+  truth.pages.acting.title ||= seed.props.title;
+  truth.pages.acting.kicker ||= seed.props.kicker;
+  truth.pages.acting.body ||= seed.props.body;
   if (!Array.isArray(truth.pages.acting.sections) || truth.pages.acting.sections.length === 0) {
     truth.pages.acting.sections = seed.props.sections.map((item) => ({
       ...item,
@@ -147,7 +149,7 @@ if (truth.pages.acting && seed.props) {
   }
 }
 
-if (truth.pages.contact && seed.contact_email) truth.pages.contact.email = seed.contact_email;
+if (truth.pages.contact && seed.contact_email) truth.pages.contact.email ||= seed.contact_email;
 
 for (const item of seed.hidden_pages || []) {
   const key = cleanKey(item.key);
@@ -167,14 +169,7 @@ for (const item of seed.hidden_pages || []) {
   };
 }
 
-// Correct obvious visible spelling issues while leaving the underlying project data intact.
-for (const block of truth.blocks || []) {
-  if (block.title === "Shakespears Twelfth Night" || block.title === "Shakespeare Twelfth Night") block.title = "Shakespeare's Twelfth Night";
-  if (block.title === "Prop Artist ( The servant of Two masters)") block.title = "Prop Artist (The Servant of Two Masters)";
-  if (block.description === "Carpentinng for Big love.") block.description = "Carpentry for Big Love.";
-  if (block.description === "spring 2026") block.description = "Spring 2026";
-}
-
+const firstBlock = rows.find((row) => !row.record_type || row.record_type === "block") || {};
 const fixedPages = ["acting", "design", "resume", "contact"];
 const fixedDefaults = Object.fromEntries(fixedPages.map((key) => [key, `/${key}/`]));
 const routeRows = new Map();
@@ -197,23 +192,32 @@ for (const [pageKey, page] of Object.entries(truth.pages || {})) {
   const routeAliases = aliases(routeRow?.route_aliases || "");
   const legacy = fixedDefaults[pageKey];
   if (legacy && legacy !== canonical && !routeAliases.includes(legacy)) routeAliases.push(legacy);
+  const explicitNavUrl = isFixed ? String(firstBlock[`nav_${pageKey}_url`] || "").trim() : "";
+  let navUrl = canonical;
+  if (explicitNavUrl) {
+    if (/^(?:https?:)?\/\//i.test(explicitNavUrl) || /^(?:mailto|tel):/i.test(explicitNavUrl) || explicitNavUrl.startsWith("#")) {
+      navUrl = explicitNavUrl;
+    } else {
+      navUrl = normalizeRoute(explicitNavUrl, fallbackName);
+      if (navUrl !== canonical && !routeAliases.includes(navUrl)) routeAliases.push(navUrl);
+    }
+  }
   const show = routeRow ? truthy(routeRow.show_in_nav) : isFixed;
   const label = (routeRow?.nav_label || routeRow?.title || page.title || pageKey).trim();
   const order = Number(routeRow?.nav_order || (fixedPages.indexOf(pageKey) + 1) * 10 || 999);
   page.path = canonical;
-  descriptors.push({ pageKey, canonical, aliases: routeAliases, show, label, order, fixed: isFixed });
+  descriptors.push({ pageKey, canonical, aliases: routeAliases, show, label, order, fixed: isFixed, navUrl });
 }
 
 // Build the top menu from the simple controls. HOME stays first and all visible
 // titles are rendered in uppercase while preserving the actual words.
-const firstBlock = rows.find((row) => !row.record_type || row.record_type === "block") || {};
 const homeLabel = (firstBlock.nav_home_label || "HOME").trim().toUpperCase();
 const pageNav = descriptors
   .filter((item) => item.show)
   .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label))
   .map((item) => ({
     label: item.label.toUpperCase(),
-    url: item.canonical,
+    url: item.navUrl || item.canonical,
     page_key: item.pageKey,
     font: fontInputs.pages[item.pageKey]?.nav_label || null,
   }));

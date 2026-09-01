@@ -58,6 +58,7 @@ type PortfolioBlock = {
   title: string;
   image_url: string;
   image_alt: string;
+  destination_url?: string;
 };
 
 type QMeta = {
@@ -78,6 +79,16 @@ function qAttrs(meta?: QMeta): HTMLAttributes<HTMLElement> & Record<string, stri
     "data-q-field": meta.field,
     "data-q-order": meta.order === undefined ? undefined : String(meta.order),
     "data-q-value": meta.value,
+  };
+}
+
+function qLinkAttrs(meta: QMeta): HTMLAttributes<HTMLElement> & Record<string, string | number | undefined> {
+  return {
+    "data-q-link-record": meta.record,
+    "data-q-link-product": meta.product,
+    "data-q-link-field": meta.field,
+    "data-q-link-order": meta.order === undefined ? undefined : String(meta.order),
+    "data-q-link-value": meta.value,
   };
 }
 
@@ -262,13 +273,21 @@ export function PortfolioSection({ section }: { section: string }) {
       {key === "acting" ? (
         <div className="props-project-grid" aria-label="PROPS projects">
           {propsCards.map((item, index) => {
-            const href = PROPS_PROJECT_ROUTES[index] || "";
+            const href = String(item.destination_url || "").trim() || PROPS_PROJECT_ROUTES[index] || "";
             return (
               <a
                 key={item.product_id || item.order}
                 className="props-project-card"
                 href={resolvedHref(href)}
                 aria-label={`Open ${item.title || `project ${index + 1}`}`}
+                {...qLinkAttrs({
+                  record: "block",
+                  product: item.product_id,
+                  order: item.order,
+                  field: "destination_url",
+                  kind: "text",
+                  value: href,
+                })}
               >
                 <span className="props-project-card-image">
                   <img
@@ -316,17 +335,21 @@ export function PortfolioSection({ section }: { section: string }) {
             return (
               <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
                 <figure className="portfolio-builder-media">
-                  {imageHref ? (
-                    <a
-                      className="portfolio-builder-image portfolio-builder-image-link"
-                      href={resolvedHref(imageHref)}
-                      aria-label={`Open ${item.header || "project"}`}
-                    >
-                      {image}
-                    </a>
-                  ) : (
-                    <div className="portfolio-builder-image">{image}</div>
-                  )}
+                  <a
+                    className={`portfolio-builder-image${imageHref ? " portfolio-builder-image-link" : ""}`}
+                    href={imageHref ? resolvedHref(imageHref) : undefined}
+                    aria-label={imageHref ? `Open ${item.header || "project"}` : undefined}
+                    {...qLinkAttrs({
+                      record: "page_section",
+                      product: key,
+                      order: item.order,
+                      field: "section_link_url",
+                      kind: "text",
+                      value: String(item.image_link_url || ""),
+                    })}
+                  >
+                    {image}
+                  </a>
                   {item.image_caption ? (
                     <figcaption className="portfolio-builder-image-caption">{item.image_caption}</figcaption>
                   ) : null}

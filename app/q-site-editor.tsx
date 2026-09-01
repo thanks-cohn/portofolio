@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import truthData from "../data/truth.generated.json";
 
 const REPOSITORY = "thanks-cohn/portofolio";
@@ -8,7 +8,7 @@ const BRANCH = "main";
 const REMOTE_TRUTH = "truth.csv";
 const DRAFT_KEY = "quandranea-site-editor-drafts-v1";
 
-type EditKind = "text" | "image";
+type EditKind = "text" | "image" | "url";
 type Draft = {
   record: "block" | "global" | "page_text" | "page_section";
   product?: string;
@@ -19,6 +19,7 @@ type Draft = {
 };
 
 type Target = Draft & { element: HTMLElement };
+type LinkTarget = Draft & { element: HTMLElement; kind: "url" };
 type CsvData = { header: string[]; rows: Record<string, string>[] };
 
 function draftId(draft: Omit<Draft, "value"> | Draft) {
@@ -62,15 +63,50 @@ function editableFromElement(element: HTMLElement): Target | null {
   };
 }
 
+function linkFromElement(element: HTMLElement): LinkTarget | null {
+  const node = element.closest<HTMLElement>("[data-q-link-field]");
+  if (!node) return null;
+  const record = node.dataset.qLinkRecord as Draft["record"] | undefined;
+  const field = node.dataset.qLinkField || "";
+  if (!record || !field) return null;
+  return {
+    element: node,
+    record,
+    product: node.dataset.qLinkProduct,
+    order: node.dataset.qLinkOrder,
+    field,
+    kind: "url",
+    value: node.dataset.qLinkValue ?? (node instanceof HTMLAnchorElement ? (node.getAttribute("href") || "") : ""),
+  };
+}
+
+function editorHref(value: string) {
+  const text = value.trim();
+  if (!text || /^(?:https?:)?\/\//i.test(text) || /^(?:mailto|tel):/i.test(text) || text.startsWith("#")) return text;
+  const path = text.startsWith("/") ? text : `/${text}`;
+  const base = String(process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/^\/+|\/+$/g, "");
+  return base && !path.startsWith(`/${base}/`) ? `/${base}${path}` : path;
+}
+
 function applyDraftToDom(draft: Draft) {
+  const isUrl = draft.kind === "url";
+  const prefix = isUrl ? "data-q-link-" : "data-q-";
   const selector = [
-    `[data-q-edit="${draft.kind}"]`,
-    `[data-q-record="${draft.record}"]`,
-    `[data-q-field="${CSS.escape(draft.field)}"]`,
-    draft.product ? `[data-q-product="${CSS.escape(draft.product)}"]` : "",
-    draft.order ? `[data-q-order="${CSS.escape(draft.order)}"]` : "",
+    isUrl ? "[data-q-link-field]" : `[data-q-edit="${draft.kind}"]`,
+    `[${prefix}record="${draft.record}"]`,
+    `[${prefix}field="${CSS.escape(draft.field)}"]`,
+    draft.product ? `[${prefix}product="${CSS.escape(draft.product)}"]` : "",
+    draft.order ? `[${prefix}order="${CSS.escape(draft.order)}"]` : "",
   ].join("");
   document.querySelectorAll<HTMLElement>(selector).forEach((node) => {
+    if (isUrl) {
+      node.dataset.qLinkValue = draft.value;
+      if (node instanceof HTMLAnchorElement) {
+        if (draft.value.trim()) node.setAttribute("href", editorHref(draft.value));
+        else node.removeAttribute("href");
+      }
+      return;
+    }
     node.dataset.qValue = draft.value;
     if (draft.kind === "image" && node instanceof HTMLImageElement) {
       if (node.getAttribute("src") !== draft.value) node.setAttribute("src", draft.value);
@@ -228,7 +264,9 @@ export function QSiteEditor() {
   const [faded, setFaded] = useState(false);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [target, setTarget] = useState<Target | null>(null);
+  const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
   const [editorValue, setEditorValue] = useState("");
+  const [linkValue, setLinkValue] = useState("");
   const [token, setToken] = useState("");
   const [status, setStatus] = useState("");
   const [publishing, setPublishing] = useState(false);
@@ -237,58 +275,93 @@ export function QSiteEditor() {
   const fileInput = useRef<HTMLInputElement | null>(null);
   const fadeTimer = useRef<number | null>(null);
 
-  const draftCount = useMemo(() => Object.keys(typeof window === "undefined" ? {} : loadDrafts()).length, [status, target]);
+  const draftCount = Object.keys(typeof window === "undefined" ? {} : loadDrafts()).length;
 
-  function scheduleFade() {
+  const scheduleFade = useCallback(() => {
     if (fadeTimer.current) window.clearTimeout(fadeTimer.current);
     fadeTimer.current = window.setTimeout(() => setFaded(true), 10_000);
-  }
+  }, []);
 
-  function reveal() {
+  const reveal = useCallback(() => {
     setFaded(false);
     scheduleFade();
-  }
+  }, [scheduleFade]);
 
   useEffect(() => {
-    setPosition({ x: Math.max(16, window.innerWidth - 84), y: Math.max(16, window.innerHeight - 92) });
+    const positionFrame = window.requestAnimationFrame(() => {
+      setPosition({ x: Math.max(16, window.innerWidth - 84), y: Math.max(16, window.innerHeight - 92) });
+    });
     scheduleFade();
     applyAllDraftsToDom();
     const observer = new MutationObserver(applyAllDraftsToDom);
     observer.observe(document.body, { childList: true, subtree: true });
     return () => {
+      window.cancelAnimationFrame(positionFrame);
       observer.disconnect();
       if (fadeTimer.current) window.clearTimeout(fadeTimer.current);
     };
-  }, []);
+  }, [scheduleFade]);
 
   useEffect(() => {
     const click = (event: MouseEvent) => {
       if (mode !== "edit") return;
       const found = editableFromElement(event.target as HTMLElement);
-      if (!found) return;
+      const foundLink = linkFromElement(event.target as HTMLElement);
+      if (!found && !foundLink) return;
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      const existing = loadDrafts()[draftId(found)];
-      const next = existing ? { ...found, value: existing.value } : found;
+      const drafts = loadDrafts();
+      const primary = found || foundLink;
+      if (!primary) return;
+      const existing = drafts[draftId(primary)];
+      const next = existing ? { ...primary, value: existing.value } : primary;
       setTarget(next);
       setEditorValue(next.value);
+      if (found && foundLink && draftId(found) !== draftId(foundLink)) {
+        const existingLink = drafts[draftId(foundLink)];
+        const nextLink = existingLink ? { ...foundLink, value: existingLink.value } : foundLink;
+        setLinkTarget(nextLink);
+        setLinkValue(nextLink.value);
+      } else {
+        setLinkTarget(null);
+        setLinkValue("");
+      }
       setMenu(null);
       reveal();
     };
     document.addEventListener("click", click, true);
     return () => document.removeEventListener("click", click, true);
-  }, [mode]);
+  }, [mode, reveal]);
 
   function saveEdit() {
     if (!target) return;
-    const { element: _element, ...draftBase } = target;
-    const draft: Draft = { ...draftBase, value: editorValue };
+    const draft: Draft = {
+      record: target.record,
+      product: target.product,
+      order: target.order,
+      field: target.field,
+      kind: target.kind,
+      value: editorValue,
+    };
     const drafts = loadDrafts();
     drafts[draftId(draft)] = draft;
-    saveDrafts(drafts);
     applyDraftToDom(draft);
+    if (linkTarget) {
+      const linkDraft: Draft = {
+        record: linkTarget.record,
+        product: linkTarget.product,
+        order: linkTarget.order,
+        field: linkTarget.field,
+        kind: "url",
+        value: linkValue,
+      };
+      drafts[draftId(linkDraft)] = linkDraft;
+      applyDraftToDom(linkDraft);
+    }
+    saveDrafts(drafts);
     setTarget(null);
+    setLinkTarget(null);
     setStatus("Saved locally. Publish when ready.");
     reveal();
   }
@@ -420,8 +493,8 @@ export function QSiteEditor() {
 
       {menu ? (
         <div className="q-site-menu" style={{ left: menu.x, top: menu.y }} role="menu" onMouseLeave={() => setMenu(null)}>
-          <button type="button" onClick={() => { setMode("edit"); setMenu(null); setStatus("EDIT mode. Click text or an image."); }}>EDIT</button>
-          <button type="button" onClick={() => { setMode("readonly"); setTarget(null); setMenu(null); setStatus("READ ONLY"); }}>READ ONLY</button>
+          <button type="button" onClick={() => { setMode("edit"); setMenu(null); setStatus("EDIT mode. Click text, an image, or a link."); }}>EDIT</button>
+          <button type="button" onClick={() => { setMode("readonly"); setTarget(null); setLinkTarget(null); setMenu(null); setStatus("READ ONLY"); }}>READ ONLY</button>
           <div className="q-site-menu-rule" />
           <button type="button" disabled={publishing} onClick={publish}>{publishing ? "PUBLISHING..." : "PUBLISH"}</button>
           <div className="q-site-menu-rule" />
@@ -431,15 +504,21 @@ export function QSiteEditor() {
       ) : null}
 
       {target ? (
-        <div className="q-site-edit-panel" role="dialog" aria-label={target.kind === "image" ? "Edit image URL" : "Edit text"}>
-          <strong>{target.kind === "image" ? "IMAGE URL" : "TEXT"}</strong>
-          {target.kind === "image" ? (
+        <div className="q-site-edit-panel" role="dialog" aria-label={target.kind === "text" ? "Edit text" : "Edit URL"}>
+          <strong>{target.kind === "text" ? "TEXT" : target.kind === "image" ? "IMAGE URL" : "LINK URL"}</strong>
+          {target.kind !== "text" ? (
             <input type="url" value={editorValue} onChange={(event) => setEditorValue(event.target.value)} autoFocus />
           ) : (
             <textarea value={editorValue} onChange={(event) => setEditorValue(event.target.value)} rows={6} autoFocus />
           )}
+          {linkTarget ? (
+            <label className="q-site-link-field">
+              <span>LINK URL</span>
+              <input type="url" value={linkValue} onChange={(event) => setLinkValue(event.target.value)} />
+            </label>
+          ) : null}
           <div>
-            <button type="button" onClick={() => setTarget(null)}>Cancel</button>
+            <button type="button" onClick={() => { setTarget(null); setLinkTarget(null); }}>Cancel</button>
             <button type="button" onClick={saveEdit}>Save</button>
           </div>
         </div>

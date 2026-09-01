@@ -113,6 +113,17 @@
 }
 .q-site-edit-panel input:focus,
 .q-site-edit-panel textarea:focus { border-color: rgba(242, 240, 233, .72); }
+.q-site-link-field {
+  display: block;
+  margin-top: 13px;
+}
+.q-site-link-field span {
+  display: block;
+  margin-bottom: 7px;
+  color: #9d9891;
+  font: 600 9px/1 Arial, Helvetica, sans-serif;
+  letter-spacing: .14em;
+}
 .q-site-edit-panel > div {
   display: flex;
   justify-content: flex-end;
@@ -149,8 +160,13 @@
 /* EDIT mode gets a restrained hover cue. READ ONLY adds no editing treatment. */
 body:has(.q-site-orb.is-editing) [data-q-edit] { cursor: text; }
 body:has(.q-site-orb.is-editing) img[data-q-edit="image"] { cursor: pointer; }
+body:has(.q-site-orb.is-editing) [data-q-link-field] { cursor: alias; }
 body:has(.q-site-orb.is-editing) [data-q-edit]:hover {
   outline: 1px dashed rgba(242, 240, 233, .5);
+  outline-offset: 5px;
+}
+body:has(.q-site-orb.is-editing) [data-q-link-field]:hover {
+  outline: 1px dashed rgba(255, 183, 219, .72);
   outline-offset: 5px;
 }
 

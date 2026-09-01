@@ -25,6 +25,12 @@ type SocialLink = {
   url: string;
 };
 
+type NavigationLink = {
+  label: string;
+  url: string;
+  page_key?: string;
+};
+
 type TopicBlock = {
   product_id: string;
   destination_label?: string;
@@ -41,6 +47,26 @@ const siteStyles = truthData.site as unknown as {
 const fontRules = siteStyles.font_rules ?? [];
 const colorRules = siteStyles.color_rules ?? [];
 const socialLinks = siteStyles.socials ?? [];
+const navigationLinks = truthData.site.header_nav as NavigationLink[];
+const homeUrl = navigationLinks.find((item) => item.page_key === "home")?.url || "/";
+
+const fixedNavFields: Record<string, string> = {
+  home: "nav_home_url",
+  acting: "nav_acting_url",
+  design: "nav_design_url",
+  resume: "nav_resume_url",
+  contact: "nav_contact_url",
+};
+
+function qLinkData(record: "block" | "global" | "page_section", field: string, value: string, product = "", order = "") {
+  return {
+    "data-q-link-record": record,
+    "data-q-link-field": field,
+    "data-q-link-value": value,
+    "data-q-link-product": product || undefined,
+    "data-q-link-order": order || undefined,
+  };
+}
 
 function resolvedHref(value: string) {
   if (!value) return "";
@@ -259,14 +285,28 @@ export function TruthChrome() {
   return (
     <>
       <div className="truth-header" aria-label="Portfolio header">
-        <a className="truth-wordmark" href={resolvedHref("/")} aria-label="Quandranea home">
+        <a
+          className="truth-wordmark"
+          href={resolvedHref(homeUrl)}
+          aria-label="Quandranea home"
+          {...qLinkData("global", "nav_home_url", homeUrl)}
+        >
           <span>{truthData.site.brand_top}</span>
           <span>{truthData.site.brand_bottom}</span>
         </a>
         <nav className="truth-nav" aria-label="Portfolio navigation">
-          {truthData.site.header_nav.map((item) => (
-            <a key={`${item.label}:${item.url}`} href={resolvedHref(item.url)}>{item.label}</a>
-          ))}
+          {navigationLinks.map((item) => {
+            const urlField = fixedNavFields[item.page_key || ""];
+            return (
+              <a
+                key={`${item.label}:${item.url}`}
+                href={resolvedHref(item.url)}
+                {...(urlField ? qLinkData("global", urlField, item.url) : {})}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
         <SocialLinks className="truth-header-socials" />
       </div>
