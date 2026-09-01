@@ -8,32 +8,35 @@ Quandranea is a lightweight, Git-backed visual portfolio with an unusually small
 
 There is no separate admin dashboard, no database-backed CMS, no giant page builder, and no need for the person maintaining the portfolio to understand GitHub, CSV files, deployment pipelines, or source code.
 
-The site opens normally in **READ ONLY** mode. A tiny floating **Q** follows the visitor across every page. It can be dragged anywhere, fades after inactivity, and returns on hover.
+The site opens normally in **READ ONLY** mode. A tiny floating **Q** follows the visitor across every page. It can be dragged anywhere, stays softly visible when idle, returns to full visibility on hover, and keeps itself clear of the footer.
 
-Right-click the Q and the site can become an editing surface.
+Right-click the Q, or long-press it on a phone, and the site can become an editing surface.
 
 > **On the spot sort of design ~<3!**
 
-We think of this as a one-of-a-kind, first-of-its-type experiment in ultra-lightweight inline publishing: a static portfolio that stays a normal website until its owner deliberately turns the page itself into the CMS.
+The underlying ideas are not something we claim to have invented or patented. Inline editing, static sites, Git-backed content, and client collaboration all existed before this project.
+
+The experiment is in how little machinery is required to combine them.
+
+Quandranea asks a simpler question: **how close can the act of noticing a change be to making and publishing that change?**
 
 ## The Q
 
-The floating Q is the entire editing interface.
+The floating Q is the everyday editing interface.
 
-Right-clicking it exposes four actions:
+Its menu includes:
 
-- **EDIT** — turns editable text and images into direct editing targets.
-- **READ ONLY** — returns the site to ordinary browsing behavior.
-- **PUBLISH** — writes approved changes back to `truth.csv` and triggers the normal deployment pipeline.
-- **GITHUB TOKEN FILE...** — opens a local file picker so the authorized editor can select a text file containing a fine-grained GitHub token.
+- **EDIT**: turns editable text and images into direct editing targets.
+- **READ ONLY**: returns the site to ordinary browsing behavior.
+- **FONT → SINGLE / MULTI**: styles one text item or a selected group of text items directly on the page.
+- **PUBLISH**: writes approved changes back to `truth.csv` and triggers the normal deployment pipeline.
+- **GITHUB TOKEN FILE...**: opens a local file picker so the authorized editor can select a text file containing a fine-grained GitHub token.
 
 The token is not committed to the repository, not written into `truth.csv`, and not stored with the published website. It is used only for the active editing session.
 
 ## What can be changed
 
-The everyday editing model is intentionally narrow.
-
-The owner mainly changes:
+The everyday editing model is intentionally narrow, but it now covers the things most likely to change during normal portfolio maintenance:
 
 - visible text
 - project titles
@@ -43,10 +46,63 @@ The owner mainly changes:
 - resume text
 - image URLs
 - portfolio section imagery
+- font family
+- font size
+- H1 / H2 / H3 visual size presets
+- solid text colors
+- gradient text colors
 
-That is the point.
+Fonts can be chosen from a small set of ordinary presets or supplied by pasting a Google Fonts `<link>` block. SINGLE applies typography to one selected text element. MULTI lets several text elements on the same page be selected and changed together.
 
-Instead of exposing every possible technical control, the editor exposes the things a portfolio owner actually changes most often: **words and pictures**.
+Typography changes can also be **REVERTED**, returning the selected text to the site's underlying style before publishing the reversal.
+
+That is the point of the editor. It does not attempt to expose every implementation detail. It exposes the decisions a portfolio owner or collaborator is actually likely to make while looking at the finished page.
+
+## A lightweight collaboration model
+
+The Q is useful beyond this particular portfolio.
+
+A traditional designer-client workflow often has a surprising amount of translation in it:
+
+```text
+client sees page
+      ↓
+writes a note or takes a screenshot
+      ↓
+explains what should change
+      ↓
+designer finds the matching component or CMS field
+      ↓
+change is made
+      ↓
+new preview is sent back
+```
+
+A small inline editing layer can collapse much of that conversation:
+
+```text
+client sees page
+      ↓
+selects the actual thing
+      ↓
+changes or previews it in place
+      ↓
+designer/client review the same surface
+      ↓
+publish
+```
+
+This is not meant to replace a full CMS for every website. It is a deliberately lean option for sites where a huge administrative system would be more machinery than the project needs.
+
+For independent web designers, small studios, portfolios, campaign sites, artist sites, restaurants, local businesses, and other relatively focused websites, the model can create a much more direct working relationship with the client.
+
+Instead of teaching the client a page builder, handing them a complicated dashboard, or asking them to describe changes indirectly, the designer can give them a controlled editing layer attached to the thing they already understand: **their website**.
+
+The designer still decides what is editable. Publishing can still require explicit authorization. The underlying design system and source code remain protected. But the client can participate at the level that matters to them: copy, imagery, typography, color, and presentation.
+
+That makes the website not merely a deliverable, but a small shared workspace between the person who built it and the person who owns it.
+
+The interesting part is not that any individual feature is unprecedented. It is that the collaboration model can remain **small, static, understandable, and cheap to maintain**.
 
 ## How publishing works
 
@@ -63,11 +119,11 @@ The workflow is deliberately small:
 ```text
 READ ONLY WEBSITE
       ↓
-right-click Q
+right-click / long-press Q
       ↓
-EDIT
+EDIT or FONT
       ↓
-change text or image URL
+change the page in place
       ↓
 PUBLISH
       ↓
@@ -108,11 +164,17 @@ If the title is wrong, click the title.
 
 If an image needs replacing, click the image and paste the new URL.
 
+If the typography feels wrong, select the text itself and change the font, size, or color while looking at it in context.
+
+If several elements should match, select them together.
+
+If an experiment looks bad, revert it.
+
 If everything looks right, publish.
 
 No translation layer between the page and the editor is required.
 
-The site itself is the visual reference, preview, and editing surface at the same time.
+The site itself is the visual reference, preview, editing surface, and collaboration surface at the same time.
 
 ## READ ONLY by default
 
@@ -128,7 +190,7 @@ READ ONLY means:
 - image clicks do not expose URL fields
 - the editing UI stays out of the way
 
-The floating Q fades after roughly ten seconds of inactivity so it does not compete with the portfolio. Hovering it brings it back immediately.
+The floating Q never needs to fully disappear. It can remain softly visible until hover, touch, or deliberate interaction brings it forward.
 
 ## Portfolio structure
 
@@ -158,13 +220,13 @@ Next.js build
 static deployment
 ```
 
-The floating Q editor simply gives the owner a much friendlier way to modify the relevant cells without needing to open the CSV manually.
+The floating Q editor simply gives the owner a much friendlier way to modify the relevant values without needing to open the CSV manually.
 
 ## Security model
 
 Publishing still requires authorization.
 
-A visitor can enter EDIT mode and experiment locally, but without a GitHub token scoped to this repository they cannot publish those changes to the official site.
+A visitor can enter editing modes and experiment locally, but without a GitHub token scoped to this repository they cannot publish those changes to the official site.
 
 Recommended token scope:
 
@@ -215,6 +277,8 @@ The unusual part is no longer only the gallery.
 
 It is the idea that a deployed static website can carry its own tiny editing surface with it, remain read-only for ordinary visitors, and become writable only when the owner deliberately unlocks publishing.
 
-**A website, a CMS, and a preview collapsed into the same surface.**
+It also suggests a broader way for website creators to work with clients: keep the architecture lean, keep authority controlled, but let the client collaborate directly with the finished surface rather than communicating every visual change through another layer of software.
+
+**A website, a CMS, a preview, and a small collaboration space collapsed into the same surface.**
 
 That is the experiment.
