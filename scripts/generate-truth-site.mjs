@@ -6,25 +6,29 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const truthCsvPath = path.join(root, "truth.csv");
 const csvText = await readFile(truthCsvPath, "utf8");
 
-// q-fonts rows are internal metadata for the newer Q typography layer. The
-// legacy generator treats every page_text product_id as a real page and throws
-// on q-fonts, which prevents unrelated image/text publishes from deploying.
+// q-fonts and the hidden PROPS case-study rows belong to the newer Q/site
+// layers. The oldest generator only understands the fixed historical pages.
 // Filter complete CSV records rather than physical lines because font payloads
-// can themselves contain newlines. The compatibility-safe generator can then
-// correctly identify and temporarily hide ordinary custom-page rows too.
+// can contain newlines. Everything is restored immediately after the legacy
+// chain finishes, so truth.csv itself remains the complete source of truth.
+const MODERN_PROJECT_KEYS = new Set(["project-a", "project-b", "project-e", "project-f"]);
 const csvRowsForLegacy = parseCsv(csvText);
 const csvHeader = csvRowsForLegacy.length ? Object.keys(csvRowsForLegacy[0]) : [];
-const legacyRows = csvRowsForLegacy.filter((row) => !(
-  row.record_type === "page_text"
-  && String(row.product_id || "").trim() === "q-fonts"
-));
+const legacyRows = csvRowsForLegacy.filter((row) => {
+  const record = String(row.record_type || "").trim();
+  const product = String(row.product_id || "").trim();
+  const isQTypography = record === "page_text" && product === "q-fonts";
+  const isModernProjectRow = ["page_text", "page_style", "page_section"].includes(record)
+    && MODERN_PROJECT_KEYS.has(product);
+  return !isQTypography && !isModernProjectRow;
+});
 const legacyCsvText = csvHeader.length ? serializeCsv(legacyRows, csvHeader) : csvText;
-const hidTypographyRows = legacyRows.length !== csvRowsForLegacy.length;
-if (hidTypographyRows) await writeFile(truthCsvPath, legacyCsvText, "utf8");
+const hidLegacyRows = legacyRows.length !== csvRowsForLegacy.length;
+if (hidLegacyRows) await writeFile(truthCsvPath, legacyCsvText, "utf8");
 try {
   await import("./generate-truth-release.mjs");
 } finally {
-  if (hidTypographyRows) await writeFile(truthCsvPath, csvText, "utf8");
+  if (hidLegacyRows) await writeFile(truthCsvPath, csvText, "utf8");
 }
 
 const truthPath = path.join(root, "data", "truth.generated.json");
@@ -343,6 +347,6 @@ truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.17.1";
+truth.schema_version = "1.17.2";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects, filtered Q metadata with CSV-aware parsing, kept the PROPS intro intact, generated four hidden case studies, and applied persistent typography assignments.");
+console.log("Preserved project redirects, shielded modern Q/project rows from the legacy generator, kept the PROPS intro intact, generated four hidden case studies, and applied persistent typography assignments.");
