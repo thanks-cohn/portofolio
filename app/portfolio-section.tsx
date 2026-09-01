@@ -22,6 +22,7 @@ type PageSection = {
   image_side: "left" | "right";
   image_url: string;
   image_alt: string;
+  image_caption?: string;
   image_link_url?: string;
   header: string;
   subheader: string;
@@ -256,17 +257,22 @@ export function PortfolioSection({ section }: { section: string }) {
 
             return (
               <section key={`${key}-${item.order}`} className={`portfolio-builder-section image-${item.image_side}`}>
-                {imageHref ? (
-                  <a
-                    className="portfolio-builder-image portfolio-builder-image-link"
-                    href={resolvedHref(imageHref)}
-                    aria-label={`Open ${item.header || "project"}`}
-                  >
-                    {image}
-                  </a>
-                ) : (
-                  <div className="portfolio-builder-image">{image}</div>
-                )}
+                <figure className="portfolio-builder-media">
+                  {imageHref ? (
+                    <a
+                      className="portfolio-builder-image portfolio-builder-image-link"
+                      href={resolvedHref(imageHref)}
+                      aria-label={`Open ${item.header || "project"}`}
+                    >
+                      {image}
+                    </a>
+                  ) : (
+                    <div className="portfolio-builder-image">{image}</div>
+                  )}
+                  {item.image_caption ? (
+                    <figcaption className="portfolio-builder-image-caption">{item.image_caption}</figcaption>
+                  ) : null}
+                </figure>
                 <div className="portfolio-builder-copy">
                   {item.header ? <TextElement tag={item.header_tag || "h2"} text={item.header} color={item.header_color} fontUrl={item.header_font_url} size={item.header_size} className="portfolio-builder-header" q={{ record: "page_section", product: key, order: item.order, field: "title" }} /> : null}
                   {item.subheader ? <TextElement tag={item.subheader_tag || "h3"} text={item.subheader} color={item.subheader_color} fontUrl={item.subheader_font_url} size={item.subheader_size} className="portfolio-builder-subheader" q={{ record: "page_section", product: key, order: item.order, field: "destination_label" }} /> : null}
