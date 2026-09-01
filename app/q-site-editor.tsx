@@ -112,7 +112,12 @@ function applyDraftToDom(draft: Draft) {
       if (node instanceof HTMLImageElement) {
         if (node.getAttribute("src") !== draft.value) node.setAttribute("src", draft.value);
       } else {
-        node.textContent = draft.value.trim() ? "IMAGE READY — PUBLISH TO VIEW" : "ADD IMAGE";
+        const placeholderText = draft.value.trim() ? "IMAGE READY — PUBLISH TO VIEW" : "ADD IMAGE";
+        // This editor watches DOM additions so saved drafts can be reapplied to
+        // content that mounts later. Replacing an unchanged text node creates a
+        // fresh child-list mutation and can otherwise keep the observer running
+        // forever after an empty image slot is edited.
+        if (node.textContent !== placeholderText) node.textContent = placeholderText;
       }
       return;
     }
