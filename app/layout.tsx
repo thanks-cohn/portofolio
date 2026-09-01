@@ -4,10 +4,12 @@ import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
 import { QSiteMarkers } from "./q-site-markers";
+import { QFontEditor } from "./q-font-editor";
 import "./globals.css";
 import "./middle-row-only.css";
 import "./editorial-overrides.css";
 import "./q-site-editor.css";
+import "./q-font-editor.css";
 
 export const metadata: Metadata = {
   title: `${truthData.site.row_heading} — ${truthData.site.row_subheader}`,
@@ -30,6 +32,7 @@ export default function RootLayout({
         <TruthChrome />
         <QSiteMarkers />
         <QSiteEditor />
+        <QFontEditor />
       </body>
     </html>
   );
