@@ -1,18 +1,15 @@
-.portfolio-section-project-a,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) {
   background:
     radial-gradient(circle at 50% 0%, rgba(255,255,255,.035), transparent 34%),
     #0b0b0b;
 }
 
-.portfolio-section-project-a .portfolio-section-copy,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-copy {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-copy {
   width: min(820px, 100%);
   min-height: calc(82vh - 120px);
 }
 
-.portfolio-section-project-a .portfolio-section-title,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-title {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-title {
   color: #f2eee8 !important;
   font-family: "Cormorant Garamond", Georgia, serif !important;
   font-size: clamp(54px, 8.5vw, 112px) !important;
@@ -23,8 +20,7 @@
   text-shadow: none !important;
 }
 
-.portfolio-section-project-a .portfolio-section-kicker,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-kicker {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-kicker {
   color: #9d9891 !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
   font-size: 10px !important;
@@ -32,8 +28,7 @@
   letter-spacing: .22em !important;
 }
 
-.portfolio-section-project-a .portfolio-section-body,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-body {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-body {
   max-width: 54ch !important;
   color: #c6c0b8 !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
@@ -41,54 +36,8 @@
   line-height: 1.8 !important;
 }
 
-/* Project A keeps the richer alternating editorial case-study layout. */
-.portfolio-section-project-a .portfolio-builder-sections {
-  width: min(1180px, 100%);
-  gap: clamp(88px, 12vw, 160px);
-}
-
-.portfolio-section-project-a .portfolio-builder-section {
-  gap: clamp(38px, 6vw, 86px);
-}
-
-.portfolio-section-project-a .portfolio-builder-image {
-  border: 1px solid rgba(242,238,232,.08);
-  background: #111 !important;
-  box-shadow: 0 24px 70px rgba(0,0,0,.28);
-}
-
-.portfolio-section-project-a .portfolio-builder-image img {
-  object-fit: cover !important;
-  object-position: center !important;
-}
-
-.portfolio-section-project-a .portfolio-builder-header {
-  color: #f2eee8 !important;
-  font-family: "Cormorant Garamond", Georgia, serif !important;
-  font-size: clamp(38px, 4.7vw, 62px) !important;
-  font-weight: 500 !important;
-  line-height: .96 !important;
-  letter-spacing: -.035em !important;
-}
-
-.portfolio-section-project-a .portfolio-builder-subheader {
-  color: #aaa39a !important;
-  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 500 !important;
-  letter-spacing: .18em !important;
-}
-
-.portfolio-section-project-a .portfolio-builder-body {
-  max-width: 40ch !important;
-  color: #c6c0b8 !important;
-  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.78 !important;
-}
-
-/* Projects B, E and F are intentionally simple: intro first, then eight images. */
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
+/* All four Props projects share one consistent portfolio pattern: intro + eight titled images. */
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
   width: min(1440px, 100%);
   margin: clamp(70px, 9vw, 120px) auto 0;
   display: grid !important;
@@ -96,26 +45,26 @@
   gap: clamp(28px, 3vw, 48px) clamp(14px, 1.8vw, 28px) !important;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section.image-right {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section,
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section.image-right {
   display: block !important;
   min-width: 0;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-media {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-media {
   display: block;
   width: 100%;
   margin: 0;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy {
   display: block !important;
   min-height: 0 !important;
   padding: 0 !important;
   text-align: center !important;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
   width: 100% !important;
   max-width: none !important;
   margin: 13px 0 0 !important;
@@ -129,12 +78,12 @@
   text-transform: none !important;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-subheader,
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-body {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-subheader,
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-body {
   display: none !important;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image {
   width: 100%;
   min-height: 0 !important;
   aspect-ratio: 4 / 5;
@@ -144,7 +93,7 @@
   box-shadow: none;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image img {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image img {
   display: block;
   width: 100%;
   height: 100%;
@@ -153,29 +102,28 @@
   transition: opacity .24s ease, transform .35s ease;
 }
 
-:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image:hover img {
+:is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-image:hover img {
   opacity: .92;
   transform: scale(1.012);
 }
 
 @media (max-width: 900px) {
-  .portfolio-section-project-a .portfolio-section-copy,
-  :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-copy {
+  :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-section-copy {
     min-height: calc(78svh - 80px);
   }
 
-  :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
+  :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 32px 18px !important;
   }
 
-  :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
+  :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
     font-size: clamp(17px, 4.5vw, 20px) !important;
   }
 }
 
 @media (max-width: 520px) {
-  :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
+  :is(.portfolio-section-project-a, .portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
     grid-template-columns: 1fr !important;
     gap: 32px !important;
   }
