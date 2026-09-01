@@ -1,46 +1,15 @@
-.portfolio-section-acting .props-project-grid-eight {
-  row-gap: clamp(42px, 5vw, 76px);
-}
-
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) {
+.portfolio-section-project-a {
   background:
     radial-gradient(circle at 50% 0%, rgba(255,255,255,.035), transparent 34%),
     #0b0b0b;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-section-copy {
+.portfolio-section-project-a .portfolio-section-copy {
   width: min(820px, 100%);
   min-height: calc(82vh - 120px);
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-section-title {
+.portfolio-section-project-a .portfolio-section-title {
   color: #f2eee8 !important;
   font-family: "Cormorant Garamond", Georgia, serif !important;
   font-size: clamp(54px, 8.5vw, 112px) !important;
@@ -51,16 +20,7 @@
   text-shadow: none !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-section-kicker {
+.portfolio-section-project-a .portfolio-section-kicker {
   color: #9d9891 !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
   font-size: 10px !important;
@@ -68,16 +28,7 @@
   letter-spacing: .22em !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-section-body {
+.portfolio-section-project-a .portfolio-section-body {
   max-width: 54ch !important;
   color: #c6c0b8 !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
@@ -85,85 +36,27 @@
   line-height: 1.8 !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-sections {
+.portfolio-section-project-a .portfolio-builder-sections {
   width: min(1180px, 100%);
   gap: clamp(88px, 12vw, 160px);
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-section {
+.portfolio-section-project-a .portfolio-builder-section {
   gap: clamp(38px, 6vw, 86px);
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-media {
-  position: relative;
-}
-
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-image {
+.portfolio-section-project-a .portfolio-builder-image {
   border: 1px solid rgba(242,238,232,.08);
   background: #111 !important;
   box-shadow: 0 24px 70px rgba(0,0,0,.28);
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-image img {
+.portfolio-section-project-a .portfolio-builder-image img {
   object-fit: cover !important;
   object-position: center !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-header {
+.portfolio-section-project-a .portfolio-builder-header {
   color: #f2eee8 !important;
   font-family: "Cormorant Garamond", Georgia, serif !important;
   font-size: clamp(38px, 4.7vw, 62px) !important;
@@ -172,16 +65,7 @@
   letter-spacing: -.035em !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-subheader {
+.portfolio-section-project-a .portfolio-builder-subheader {
   color: #aaa39a !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
   font-size: 10px !important;
@@ -189,16 +73,7 @@
   letter-spacing: .18em !important;
 }
 
-:is(
-  .portfolio-section-project-a,
-  .portfolio-section-project-b,
-  .portfolio-section-project-e,
-  .portfolio-section-project-f,
-  .portfolio-section-project-g,
-  .portfolio-section-project-h,
-  .portfolio-section-project-i,
-  .portfolio-section-project-j
-) .portfolio-builder-body {
+.portfolio-section-project-a .portfolio-builder-body {
   max-width: 40ch !important;
   color: #c6c0b8 !important;
   font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
@@ -206,21 +81,109 @@
   line-height: 1.78 !important;
 }
 
+.props-gallery-project {
+  min-height: 100vh;
+  padding-top: clamp(132px, 16vw, 190px);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.028), transparent 30%),
+    #0b0b0b;
+}
+
+.props-gallery-intro {
+  width: min(820px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.props-gallery-kicker {
+  margin: 0 0 18px;
+  color: #9d9891 !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+.props-gallery-title {
+  margin: 0;
+  color: #f2eee8 !important;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(54px, 8.5vw, 112px) !important;
+  font-weight: 500 !important;
+  line-height: .86 !important;
+  letter-spacing: -.045em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+.props-gallery-rule {
+  width: 44px;
+  height: 1px;
+  margin: 30px auto;
+  background: #f2eee8;
+  opacity: .24;
+}
+
+.props-gallery-body {
+  max-width: 54ch;
+  margin: 0 auto;
+  color: #c6c0b8 !important;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400;
+  line-height: 1.8 !important;
+}
+
+.props-gallery-images {
+  width: min(1440px, 100%);
+  margin: clamp(70px, 9vw, 120px) auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 28px);
+}
+
+.props-gallery-image {
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid rgba(242,238,232,.07);
+}
+
+.props-gallery-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: opacity .24s ease, transform .35s ease;
+}
+
+.props-gallery-image:hover img {
+  opacity: .92;
+  transform: scale(1.012);
+}
+
 @media (max-width: 900px) {
-  .portfolio-section-acting .props-project-grid-eight {
-    row-gap: 38px;
+  .portfolio-section-project-a .portfolio-section-copy {
+    min-height: calc(78svh - 80px);
   }
 
-  :is(
-    .portfolio-section-project-a,
-    .portfolio-section-project-b,
-    .portfolio-section-project-e,
-    .portfolio-section-project-f,
-    .portfolio-section-project-g,
-    .portfolio-section-project-h,
-    .portfolio-section-project-i,
-    .portfolio-section-project-j
-  ) .portfolio-section-copy {
-    min-height: calc(78svh - 80px);
+  .props-gallery-images {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .props-gallery-project {
+    padding-inline: 18px;
+  }
+
+  .props-gallery-images {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 }
