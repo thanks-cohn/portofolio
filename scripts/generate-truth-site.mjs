@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// Build all CSV-driven data, routes, social links and compatibility behavior first.
 await import("./generate-truth-release.mjs");
 
 const truthPath = path.join(root, "data", "truth.generated.json");
@@ -72,6 +71,52 @@ function parseFontTarget(value) {
   return { record, product, order, field };
 }
 
+function normalizeTypography(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+
+  try {
+    const payload = JSON.parse(raw);
+    if (payload?.revert) return { revert: true };
+
+    const style = {};
+    if (payload?.fontInput) {
+      const font = normalizeFontInput(payload.fontInput);
+      if (font) {
+        const family = payload.fontFamily && font.families.includes(payload.fontFamily)
+          ? payload.fontFamily
+          : font.family;
+        style.font = { ...font, family };
+      }
+    }
+
+    if (payload?.color?.mode === "solid" && payload.color.value) {
+      style.color = { mode: "solid", value: String(payload.color.value) };
+    } else if (payload?.color?.mode === "gradient" && payload.color.start && payload.color.end) {
+      style.color = {
+        mode: "gradient",
+        start: String(payload.color.start),
+        end: String(payload.color.end),
+        angle: Number.isFinite(Number(payload.color.angle)) ? Number(payload.color.angle) : 90,
+      };
+    }
+
+    if (payload?.size && ["h1", "h2", "h3", "custom"].includes(payload.size.mode)) {
+      if (payload.size.mode === "custom") {
+        const px = Number(payload.size.px);
+        if (Number.isFinite(px) && px > 0) style.size = { mode: "custom", px };
+      } else {
+        style.size = { mode: payload.size.mode };
+      }
+    }
+
+    return Object.keys(style).length ? { style } : null;
+  } catch {
+    const font = normalizeFontInput(raw);
+    return font ? { style: { font } } : null;
+  }
+}
+
 function normalizedSection(item) {
   return {
     ...item,
@@ -90,9 +135,6 @@ function mergeSeedSections(page, seedSections) {
       .map((item) => [Number(item.order), item]),
   );
 
-  // CSV/Q edits own the visible image and text fields, but a missing click target
-  // must never mean "delete the project link". The destination belongs to the
-  // section wrapper, independently of whichever image URL is currently shown.
   for (const item of seedSections || []) {
     const order = Number(item?.order);
     if (!Number.isInteger(order) || order < 1) continue;
@@ -112,8 +154,6 @@ function mergeSeedSections(page, seedSections) {
   page.sections = [...byOrder.values()].sort((a, b) => Number(a.order) - Number(b.order));
 }
 
-// PROPS and DESIGN are editorial overview pages. Preserve every untouched seed
-// row while allowing any individual CSV/Q edit to override its matching order.
 if (truth.pages?.acting && seed.props) {
   mergeSeedSections(truth.pages.acting, seed.props.sections || []);
 }
@@ -121,8 +161,6 @@ if (truth.pages?.design && seed.design) {
   mergeSeedSections(truth.pages.design, seed.design.sections || []);
 }
 
-// Hidden project pages work the same way: one edited row must not collapse the
-// other three seeded rows. Existing CSV rows win order-by-order.
 for (const item of seed.hidden_pages || []) {
   const key = String(item.key || "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "");
   const page = truth.pages?.[key];
@@ -130,25 +168,28 @@ for (const item of seed.hidden_pages || []) {
   mergeSeedSections(page, item.sections || []);
 }
 
-// FONT and MULTI-FONT use ordinary page_text rows so the existing Q publisher
-// can save them without a second backend. The row title encodes the exact
-// data-q target; the description stores the complete copied Google Fonts input.
-truth.q_fonts = parseCsv(csvText)
+const typographyRows = parseCsv(csvText)
   .filter((row) => row.record_type === "page_text" && String(row.product_id || "").trim() === "q-fonts")
   .map((row) => {
     const target = parseFontTarget(row.title);
-    const font = normalizeFontInput(row.description);
-    return target && font ? { target, font } : null;
+    const normalized = normalizeTypography(row.description);
+    return target && normalized ? { target, ...normalized } : null;
   })
   .filter(Boolean);
 
-// Twitter/X was intentionally removed. Even if an older truth.csv still has a
-// stale row, only the two approved social profiles can reach the rendered site.
+truth.q_typography = typographyRows
+  .filter((item) => !item.revert && item.style)
+  .map((item) => ({ target: item.target, style: item.style }));
+
+truth.q_fonts = truth.q_typography
+  .filter((item) => item.style?.font)
+  .map((item) => ({ target: item.target, font: item.style.font }));
+
 truth.site ||= {};
 truth.site.socials = (truth.site.socials || []).filter((item) =>
   ["facebook", "instagram"].includes(String(item.platform || "").trim().toLowerCase()),
 );
 
-truth.schema_version = "1.13.0";
+truth.schema_version = "1.14.0";
 await writeFile(truthPath, `${JSON.stringify(truth, null, 2)}\n`, "utf8");
-console.log("Preserved project redirects and applied persistent Q font assignments.");
+console.log("Preserved project redirects and applied persistent Q typography assignments.");
