@@ -148,6 +148,31 @@
   outline-offset: 4px;
 }
 
+/* Image + caption stay together as one grid item. This lets alternating rows
+   continue to work while captions live directly below their image. */
+.portfolio-builder-media {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.portfolio-builder-section.image-right .portfolio-builder-media {
+  order: 2;
+}
+
+.portfolio-builder-section.image-right .portfolio-builder-copy {
+  order: 1;
+}
+
+.portfolio-builder-image-caption {
+  margin: 10px 2px 0;
+  color: #72ff8d;
+  font: 400 10px/1.45 "Courier New", Courier, monospace;
+  letter-spacing: .01em;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
 /* Only the text paired with editorial images is centered. The page intro above
    remains governed by its own independent styling controls. */
 .portfolio-builder-copy {
@@ -185,5 +210,10 @@
   .portfolio-builder-copy {
     min-height: auto;
     padding: 4px 10px 0;
+  }
+
+  .portfolio-builder-section.image-right .portfolio-builder-media,
+  .portfolio-builder-section.image-right .portfolio-builder-copy {
+    order: initial;
   }
 }
