@@ -1,0 +1,6 @@
+/* Portfolio presentation: keep catalog pricing data intact, but do not display prices. */
+.tile-meta > em,
+.work-copy > span,
+.mobile-rotunda-meta > span {
+  display: none !important;
+}
