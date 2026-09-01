@@ -4,7 +4,7 @@ import { resolveAssetPath } from "../lib/asset-path.mjs";
 import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
 import { QSiteMarkers } from "./q-site-markers";
-import { QFontEditor } from "./q-font-editor";
+import { QFontEditorStable } from "./q-font-editor-stable";
 import { QMenuGrace } from "./q-menu-grace";
 import "./globals.css";
 import "./middle-row-only.css";
@@ -33,7 +33,7 @@ export default function RootLayout({
         <TruthChrome />
         <QSiteMarkers />
         <QSiteEditor />
-        <QFontEditor />
+        <QFontEditorStable />
         <QMenuGrace />
       </body>
     </html>
