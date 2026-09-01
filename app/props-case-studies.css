@@ -93,7 +93,7 @@
   margin: clamp(70px, 9vw, 120px) auto 0;
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: clamp(14px, 1.8vw, 28px) !important;
+  gap: clamp(28px, 3vw, 48px) clamp(14px, 1.8vw, 28px) !important;
 }
 
 :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-section,
@@ -109,6 +109,28 @@
 }
 
 :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy {
+  display: block !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 13px 0 0 !important;
+  color: #e5dfd7 !important;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(16px, 1.45vw, 21px) !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .015em !important;
+  text-align: center !important;
+  text-transform: none !important;
+}
+
+:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-subheader,
+:is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-body {
   display: none !important;
 }
 
@@ -144,13 +166,17 @@
 
   :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 18px !important;
+    gap: 32px 18px !important;
+  }
+
+  :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-copy .portfolio-builder-header {
+    font-size: clamp(17px, 4.5vw, 20px) !important;
   }
 }
 
 @media (max-width: 520px) {
   :is(.portfolio-section-project-b, .portfolio-section-project-e, .portfolio-section-project-f) .portfolio-builder-sections {
     grid-template-columns: 1fr !important;
-    gap: 18px !important;
+    gap: 32px !important;
   }
 }
