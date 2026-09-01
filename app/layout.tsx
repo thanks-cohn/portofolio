@@ -5,6 +5,7 @@ import { TruthChrome } from "./truth-chrome";
 import { QSiteEditor } from "./q-site-editor";
 import { QSiteMarkers } from "./q-site-markers";
 import { QFontEditor } from "./q-font-editor";
+import { QMenuGrace } from "./q-menu-grace";
 import "./globals.css";
 import "./middle-row-only.css";
 import "./editorial-overrides.css";
@@ -33,6 +34,7 @@ export default function RootLayout({
         <QSiteMarkers />
         <QSiteEditor />
         <QFontEditor />
+        <QMenuGrace />
       </body>
     </html>
   );
